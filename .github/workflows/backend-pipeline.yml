@@ -1,0 +1,208 @@
+name: backend_pipeline
+run-name: backend deployment by ${{ github.actor }}
+
+on:
+    push:
+        branches:
+            - develop
+            - uat
+            - main
+        paths:
+            - 'apps/backend/**'
+            - 'libs/shared/**'
+
+jobs:
+    build:
+        name: Build Backend
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v4
+
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
+
+            - name: Login to DockerHub
+              uses: docker/login-action@v3.3.0
+              with:
+                  username: ${{ secrets.DOCKER_USERNAME }}
+                  password: ${{ secrets.DOCKER_PASSWORD }}
+
+            - name: Set Environment Variables
+              run: |
+                  case $GITHUB_REF in
+                    refs/heads/develop)
+                      echo "PORT_BACKEND=8000" >> $GITHUB_ENV
+                      echo "DOCKER_TAG=develop" >> $GITHUB_ENV
+                      ;;
+                    refs/heads/uat)
+                      echo "PORT_BACKEND=8000" >> $GITHUB_ENV
+                       echo "DOCKER_TAG=uat" >> $GITHUB_ENV
+                      ;;
+                    refs/heads/main)
+                      echo "PORT_BACKEND=8000" >> $GITHUB_ENV
+                      echo "DOCKER_TAG=prod" >> $GITHUB_ENV
+                      ;;
+                  esac
+
+            - name: Backup existing image if exists
+              run: |
+                  IMAGE_EXISTS=$(docker manifest inspect ${{ secrets.DOCKER_USERNAME }}/backend:${{ env.DOCKER_TAG }} > /dev/null 2>&1 && echo "YES" || echo "NO")
+                  if [ "$IMAGE_EXISTS" = "YES" ]; then
+                    echo "Backup existing image..."
+
+                    docker pull ${{ secrets.DOCKER_USERNAME }}/backend:${{ env.DOCKER_TAG }}
+                    docker tag ${{ secrets.DOCKER_USERNAME }}/backend:${{ env.DOCKER_TAG }} ${{ secrets.DOCKER_USERNAME }}/backend:${{ env.DOCKER_TAG }}_backup
+                    docker push ${{ secrets.DOCKER_USERNAME }}/backend:${{ env.DOCKER_TAG }}_backup
+                  else
+                    echo "No existing image to backup."
+                  fi
+
+            - name: Build and Push Backend Docker Image
+              uses: docker/build-push-action@v6
+              with:
+                  context: .
+                  file: devops/backend/Dockerfile
+                  push: true
+                  tags: ${{ secrets.DOCKER_USERNAME }}/backend:${{ env.DOCKER_TAG }}
+                  build-args: |
+                      PORT_BACKEND=${{ env.PORT_BACKEND }}
+
+    deploy:
+        name: Deploy Backend
+        runs-on: ubuntu-latest
+        needs: build
+        steps:
+            - name: Set Environment Variables
+              run: |
+                  case $GITHUB_REF in
+                    refs/heads/develop)
+                      echo "APP_ENV=DEV" >> $GITHUB_ENV
+                      echo "PORT_BACKEND=8000" >> $GITHUB_ENV
+                      echo "PORT_FRONTEND=80" >> $GITHUB_ENV
+                      echo "DOCKER_TAG=develop" >> $GITHUB_ENV
+                      echo "ROUTE_PREFIX=api" >> $GITHUB_ENV
+                      echo "KEY_VAULT_URI=${{ secrets.DEV_KEY_VAULT_URI }}" >> $GITHUB_ENV
+                      echo "TENANT_ID=${{ secrets.DEV_TENANT_ID }}" >> $GITHUB_ENV
+                      echo "CLIENT_ID=${{ secrets.DEV_CLIENT_ID }}" >> $GITHUB_ENV
+                      echo "CLIENT_SECRET=${{ secrets.DEV_CLIENT_SECRET }}" >> $GITHUB_ENV
+                      echo "SERVER_HOST=${{ secrets.DEV_SERVER_HOST }}" >> $GITHUB_ENV
+                      echo "SERVER_PASS_PHRASE=${{ secrets.DEV_SERVER_PASS_PHRASE }}" >> $GITHUB_ENV
+                      echo "SERVER_PRIVATE_SSH_KEY<<EOF" >> $GITHUB_ENV
+                      echo "${{ secrets.DEV_SERVER_PRIVATE_SSH_KEY }}" >> $GITHUB_ENV
+                      echo "EOF" >> $GITHUB_ENV
+                      echo "SERVER_USER=${{ secrets.DEV_SERVER_USER }}" >> $GITHUB_ENV
+                      ;;
+                    refs/heads/uat)
+                      echo "APP_ENV=UAT" >> $GITHUB_ENV
+                      echo "PORT_BACKEND=8000" >> $GITHUB_ENV
+                      echo "PORT_FRONTEND=80" >> $GITHUB_ENV
+                      echo "DOCKER_TAG=uat" >> $GITHUB_ENV
+                      echo "ROUTE_PREFIX=api" >> $GITHUB_ENV
+                      echo "KEY_VAULT_URI=${{ secrets.UAT_KEY_VAULT_URI }}" >> $GITHUB_ENV
+                      echo "TENANT_ID=${{ secrets.UAT_TENANT_ID }}" >> $GITHUB_ENV
+                      echo "CLIENT_ID=${{ secrets.UAT_CLIENT_ID }}" >> $GITHUB_ENV
+                      echo "CLIENT_SECRET=${{ secrets.UAT_CLIENT_SECRET }}" >> $GITHUB_ENV
+                      echo "SERVER_HOST=${{ secrets.UAT_SERVER_HOST }}" >> $GITHUB_ENV
+                      echo "SERVER_PASS_PHRASE=${{ secrets.UAT_SERVER_PASS_PHRASE }}" >> $GITHUB_ENV
+                      echo "SERVER_PRIVATE_SSH_KEY<<EOF" >> $GITHUB_ENV
+                      echo "${{ secrets.UAT_SERVER_PRIVATE_SSH_KEY }}" >> $GITHUB_ENV
+                      echo "EOF" >> $GITHUB_ENV
+                      echo "SERVER_USER=${{ secrets.UAT_SERVER_USER }}" >> $GITHUB_ENV
+                      ;;
+                    refs/heads/main)
+                      echo "APP_ENV=PROD" >> $GITHUB_ENV
+                      echo "PORT_BACKEND=8000" >> $GITHUB_ENV
+                      echo "PORT_FRONTEND=80" >> $GITHUB_ENV
+                      echo "DOCKER_TAG=prod" >> $GITHUB_ENV
+                      echo "ROUTE_PREFIX=api" >> $GITHUB_ENV
+                      echo "KEY_VAULT_URI=${{ secrets.PROD_KEY_VAULT_URI }}" >> $GITHUB_ENV
+                      echo "TENANT_ID=${{ secrets.PROD_TENANT_ID }}" >> $GITHUB_ENV
+                      echo "CLIENT_ID=${{ secrets.PROD_CLIENT_ID }}" >> $GITHUB_ENV
+                      echo "CLIENT_SECRET=${{ secrets.PROD_CLIENT_SECRET }}" >> $GITHUB_ENV
+                      echo "SERVER_HOST=${{ secrets.PROD_SERVER_HOST }}" >> $GITHUB_ENV
+                      echo "SERVER_PASS_PHRASE=${{ secrets.PROD_SERVER_PASS_PHRASE }}" >> $GITHUB_ENV
+                      echo "SERVER_PRIVATE_SSH_KEY<<EOF" >> $GITHUB_ENV
+                      echo "${{ secrets.PROD_SERVER_PRIVATE_SSH_KEY }}" >> $GITHUB_ENV
+                      echo "EOF" >> $GITHUB_ENV
+                      echo "SERVER_USER=${{ secrets.PROD_SERVER_USER }}" >> $GITHUB_ENV
+                      ;;
+                  esac
+
+            - name: Deploy to Digital Ocean Droplet via SSH
+              uses: appleboy/ssh-action@v1.0.3
+              with:
+                  host: ${{ env.SERVER_HOST }}
+                  username: ${{ env.SERVER_USER }}
+                  key: ${{ env.SERVER_PRIVATE_SSH_KEY }}
+                  passphrase: ${{ env.SERVER_PASS_PHRASE }}
+                  script: |
+                      # Check if Docker is installed
+                      if ! command -v docker &> /dev/null; then
+                          echo "Docker not found, installing..."
+
+                          # Install Docker
+                          curl -fsSL https://get.docker.com -o get-docker.sh
+                          sh get-docker.sh
+                      else
+                          echo "Docker is already installed."
+                      fi
+
+                      # Pull the latest image
+                      docker pull ${{ secrets.DOCKER_USERNAME }}/backend:${{ env.DOCKER_TAG }}
+
+                      # Check if the container is running
+                      if [ "$(docker ps -q -f name=backend)" ]; then
+                          # Stop and remove the old container if it exists
+                          docker stop backend
+                          docker rm backend
+                      fi
+
+                      # Run the new container
+                      docker run -d \
+                        --restart always \
+                        --name backend \
+                        -p ${{ env.PORT_BACKEND }}:${{ env.PORT_BACKEND }} \
+                        -e APP_ENV=${{ env.APP_ENV }} \
+                        -e PORT_BACKEND=${{ env.PORT_BACKEND }} \
+                        -e PORT_FRONTEND=${{ env.PORT_FRONTEND }} \
+                        -e ROUTE_PREFIX=${{ env.ROUTE_PREFIX }} \
+                        -e KEY_VAULT_URI=${{ env.KEY_VAULT_URI }} \
+                        -e TENANT_ID=${{ env.TENANT_ID }} \
+                        -e CLIENT_ID=${{ env.CLIENT_ID }} \
+                        -e CLIENT_SECRET=${{ env.CLIENT_SECRET }} \
+                        ${{ secrets.DOCKER_USERNAME }}/backend:${{ env.DOCKER_TAG }}
+
+                      # Check if the new container started successfully
+                      if [ "$(docker ps -q -f name=backend)" ]; then
+                          echo "Backend container started successfully."
+                      else
+                          echo "New backend container failed to start. Rolling back to backup..."
+
+                          # Stop and remove failed container (if it exists)
+                          docker stop backend || true
+                          docker rm backend || true
+
+                          # Pull the latest image
+                          docker pull ${{ secrets.DOCKER_USERNAME }}/backend:${{ env.DOCKER_TAG }}_backup
+
+                          # Start the previous backed-up container
+                          docker run -d \
+                            --restart always \
+                            --name backend \
+                            -p ${{ env.PORT_BACKEND }}:${{ env.PORT_BACKEND }} \
+                            -e APP_ENV=${{ env.APP_ENV }} \
+                            -e PORT_BACKEND=${{ env.PORT_BACKEND }} \
+                            -e PORT_FRONTEND=${{ env.PORT_FRONTEND }} \
+                            -e ROUTE_PREFIX=${{ env.ROUTE_PREFIX }} \
+                            -e KEY_VAULT_URI=${{ env.KEY_VAULT_URI }} \
+                            -e TENANT_ID=${{ env.TENANT_ID }} \
+                            -e CLIENT_ID=${{ env.CLIENT_ID }} \
+                            -e CLIENT_SECRET=${{ env.CLIENT_SECRET }} \
+                            ${{ secrets.DOCKER_USERNAME }}/backend:${{ env.DOCKER_TAG }}_backup
+
+                          echo "Rolled back to the previous backend container."
+                      fi
+
+                      # Remove old backend images (dangling images)
+                      docker images --filter "dangling=true" --format "{{.ID}}" | xargs -r docker rmi || true

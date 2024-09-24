@@ -1,0 +1,16 @@
+{
+    "recommendations": [
+        "esbenp.prettier-vscode",
+        "firsttris.vscode-jest-runner",
+        "eamodio.gitlens",
+        "streetsidesoftware.code-spell-checker",
+        "kisstkondoros.vscode-codemetrics",
+        "dbaeumer.vscode-eslint",
+        "visualstudioexptteam.vscodeintellicode",
+        "visualstudioexptteam.intellicode-api-usage-examples",
+        "pkief.material-icon-theme",
+        "nrwl.angular-console",
+        "sonarsource.sonarlint-vscode",
+        "redhat.vscode-yaml"
+    ]
+}

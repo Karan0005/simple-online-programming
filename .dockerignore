@@ -1,0 +1,42 @@
+# Node modules (usually don't want to copy these into Docker)
+node_modules
+
+# Output directories for builds (Angular and Nest.js)
+dist
+out
+build
+.angular
+.nx
+backup
+
+# Nx cache and artifacts
+tmp
+coverage
+
+# Environment variables (shouldn't be included in Docker image)
+.env
+.env.local
+.env.*.local
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.swp
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Docker-related files and folders
+docker-compose.yml
+docker-compose.override.yml
+
+# Git files and folders
+.git
+.gitignore
+
+# Other unneeded files (optional)
+README.md

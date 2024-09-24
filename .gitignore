@@ -1,0 +1,93 @@
+# General files to ignore
+.DS_Store
+Thumbs.db
+backup/
+*.log
+*.tmp
+*.swp
+*.swo
+*.bak
+
+# Git specific
+*.orig
+*.rej
+*.lock
+*.zip
+*.tar.gz
+
+# Python-related files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.env
+.env
+venv/
+dist/
+*.egg-info/
+.coverage
+.tox/
+pip-log.txt
+pytest_cache/
+
+# FastAPI specific
+instance/
+*.sqlite
+*.db
+
+# Docker-related files
+docker-compose.override.yml
+docker-compose.local.yml
+docker/
+*.pid
+/tmp
+docker-volume/
+container_data/
+
+# Node/Angular-related files
+node_modules/
+dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+/.angular
+/angular.json
+/.angular
+/.cache/
+.angular/cache/
+src/**/*.js
+src/**/*.js.map
+
+# IDE specific (VSCode, IntelliJ, Sublime, etc.)
+.idea/
+.vscode/*
+*.iml
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-*
+*.sublime-workspace
+
+# Include specific VSCode files
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# System Files
+.nx/
+
+# Compiled output
+/out-tsc
+/sass-cache
+/connect.lock
+/libpeerconnection.log
+/coverage
+/testem.log
+/typings

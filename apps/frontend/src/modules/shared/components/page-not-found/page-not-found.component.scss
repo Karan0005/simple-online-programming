@@ -1,0 +1,79 @@
+@import '../../../../variables.scss';
+.page-404 {
+    background: #fff !important;
+    font-family: $roboto-font-family;
+    h1 {
+        color: $button-color;
+        position: relative;
+        z-index: 100;
+        font-family: cursive;
+        height: 15vh;
+        font-size: 100px;
+        top: 10px;
+    }
+    .four-zero-four-bg {
+        background-image: url('../../../../assets/images/lost.gif ');
+        background-repeat: no-repeat;
+        background-position: center bottom -50px;
+        background-size: inherit;
+        position: relative;
+        height: 60vh;
+    }
+    .link-404 {
+        color: #fff !important;
+        padding: 10px 20px;
+        background: $button-color;
+        margin: 20px 0;
+        display: inline-block;
+    }
+
+    .content-box-404 {
+        font-family: $roboto-font-family;
+        position: relative;
+        top: -80px;
+        height: 23.5vh;
+        h3 {
+            font-weight: 400;
+            font-size: 50px;
+            font-family: cursive;
+            img {
+                width: 50px;
+                position: relative;
+                top: -2px;
+                left: 6px;
+            }
+        }
+        p {
+            font-weight: 400;
+            font-size: 20px;
+            color: #393939;
+            font-family: cursive;
+            position: relative;
+            top: -2px;
+        }
+        a {
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    }
+}
+
+@media (max-width: 700px) {
+    .page-404 {
+        h1 {
+            font-size: 100px !important;
+        }
+        .four-zero-four-bg {
+            top: -30px;
+        }
+
+        .content-box-404 {
+            h3 {
+                font-size: 40px !important;
+                img {
+                    top: 0px !important;
+                }
+            }
+        }
+    }
+}

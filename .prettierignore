@@ -1,0 +1,26 @@
+# Ignore all node_modules directories at any level
+**/node_modules/**
+
+# Ignore build and output directories
+/architecture
+**/dist/**
+**/build/**
+**/coverage/**
+**/tmp/**
+/.nx/cache
+/.nx/workspace-data
+.angular
+
+# Ignore compiled JS and TypeScript declaration files
+**/*.d.ts
+
+# Ignore environment and lock files
+*.env
+*.lock
+package-lock.json
+yarn.lock
+
+# Ignore IDE-specific files
+.vscode/
+.idea/
+.DS_Store

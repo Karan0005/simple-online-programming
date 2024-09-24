@@ -1,0 +1,108 @@
+{
+    // Enable ESLint and Prettier extensions to auto-format on save
+	"editor.formatOnSave": true,
+	"editor.codeActionsOnSave": {
+  		"source.fixAll.eslint": "explicit",  // Use "explicit" for ESLint fixAll
+  		"source.organizeImports": "explicit"  // Automatically organize imports explicitly
+	},
+
+	// Prettier settings (these should match your prettier.config.json)
+	"prettier.tabWidth": 4,
+	"prettier.useTabs": false,
+	"prettier.singleQuote": true,
+	"prettier.semi": true,
+	"prettier.trailingComma": "none",
+	"prettier.arrowParens": "always",
+	"prettier.printWidth": 160,
+	"prettier.bracketSpacing": true,
+	"prettier.bracketSameLine": false,
+	"prettier.endOfLine": "auto",
+
+	// ESLint settings
+	"eslint.enable": true,
+	"eslint.options": {
+	  "extensions": [".js", ".ts", ".jsx", ".tsx"]
+	},
+	"eslint.validate": [
+	  "javascript",
+	  "typescript",
+	  "javascriptreact",
+	  "typescriptreact",
+	  "html",
+	  "vue",
+	],
+
+	// TypeScript specific settings
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"typescript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
+	"typescript.format.semicolons": "insert",
+
+	// Control indentation based on your project setup
+	"editor.detectIndentation": false,
+	"editor.tabSize": 4,
+	"editor.insertSpaces": true,  // Use tabs instead of spaces
+
+	// Files and Languages
+	"files.trimTrailingWhitespace": true,
+	"files.insertFinalNewline": true,
+	"files.exclude": {
+	  "**/.git": true
+	},
+	"files.associations": {
+	  "*.json": "jsonc"  // JSON with comments support
+	},
+
+	// HTML and CSS support
+	"css.validate": true,
+    "scss.validate": true,
+	"html.format.wrapLineLength": 160,
+	"html.format.indentInnerHtml": true,
+
+	// Terminal settings
+	"terminal.integrated.defaultProfile.linux": "bash",
+	"terminal.integrated.defaultProfile.windows": "PowerShell",
+    "terminal.integrated.defaultProfile.osx": "zsh",
+    "cSpell.words": [
+        "appleboy",
+        "Buildable",
+        "Buildx",
+        "cacheable",
+        "camelcase",
+        "codemetrics",
+        "cout",
+        "dbaeumer",
+        "DDTHH",
+        "devkit",
+        "Dockerized",
+        "eamodio",
+        "elif",
+        "endl",
+        "esac",
+        "firsttris",
+        "frameguard",
+        "hsts",
+        "intellicode",
+        "iostream",
+        "Karan",
+        "kisstkondoros",
+        "MITM",
+        "multicursor",
+        "nestjs",
+        "nrwl",
+        "pkief",
+        "preinstall",
+        "sandboxed",
+        "sonarlint",
+        "sonarsource",
+        "SSHKEY",
+        "SSSZ",
+        "toastr",
+        "topnav",
+        "uncolorize",
+        "visualstudioexptteam",
+        "vscodeintellicode"
+    ],
+    "typescript.preferences.importModuleSpecifier": "shortest",
+    "typescript.suggest.autoImports": true,
+    "javascript.suggest.autoImports": true
+}

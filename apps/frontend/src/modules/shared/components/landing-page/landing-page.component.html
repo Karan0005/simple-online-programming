@@ -1,0 +1,113 @@
+<header>
+    <div class="container">
+        <!-- First Section: Elegant Title -->
+        <div class="header-left">
+            <h1 class="title">Simplified Coding</h1>
+        </div>
+
+        <div class="header-center">
+            <div class="custom-dropdown">
+                <div class="dropdown-selected" (click)="toggleDropdown()">
+                    <img [src]="'assets/logo/' + selectedLanguage.img" alt="" />
+                    {{ selectedLanguage.value }}
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <ul class="dropdown-list" [ngClass]="{ show: dropdownOpen }">
+                    <li *ngFor="let language of languages" (click)="selectLanguage(language)">
+                        <img [src]="'assets/logo/' + language['img']" alt="" />
+                        {{ language['value'] }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Third Section: Theme Toggle and Social Links -->
+        <div class="header-right">
+            <div>
+                <input
+                    type="checkbox"
+                    class="checkbox"
+                    id="checkbox"
+                    (change)="onThemeToggle($event)"
+                />
+                <label for="checkbox" class="checkbox-label">
+                    <i class="fas fa-moon"></i>
+                    <i class="fas fa-sun"></i>
+                    <span class="ball"></span>
+                </label>
+            </div>
+            <!-- Social Media Links -->
+            <a href="https://github.com" target="_blank" class="btn" aria-label="GitHub">
+                <i class="bi bi-github"></i>
+            </a>
+            <a href="https://linkedin.com" target="_blank" class="btn" aria-label="LinkedIn">
+                <i class="bi bi-linkedin"></i>
+            </a>
+        </div>
+    </div>
+</header>
+
+<main class="container mt-4 wrapper-area">
+    <div class="row g-3">
+        <!-- Coding Area where user can do coding-->
+        <div class="col-xxl-8 col-xl-8 col-lg-6 col-md-12 coding-area">
+            <app-monaco-editor
+                [(value)]="sourceCode"
+                [language]="selectedLanguage.value"
+                [theme]="selectedTheme"
+                (valueChange)="onEditorChange($event)"
+            ></app-monaco-editor>
+        </div>
+        <!-- Input-Output Area where user can give input and check the output-->
+        <div class="col-xxl-4 col-xl-4 col-lg-6 col-md-12 form-area">
+            <div class="form-fields">
+                <div class="mb-3">
+                    <label for="execution-power-select" class="form-label">Execution Power:</label>
+                    <select
+                        id="execution-power-select"
+                        class="form-select"
+                        [(ngModel)]="executionPower"
+                    >
+                        <option *ngFor="let power of executionPowers" [value]="power">
+                            {{ power }}
+                        </option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="timeout-select" class="form-label">Timeout:</label>
+                    <select id="timeout-select" class="form-select" [(ngModel)]="selectedTimeout">
+                        <option *ngFor="let timeout of timeouts" [value]="timeout['value']">
+                            {{ timeout['label'] }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <!--Input Area-->
+            <div class="mb-3 input textarea-label">
+                <label for="stdin-input" class="form-label">STDIN:</label>
+                <textarea
+                    id="stdin-input"
+                    class="form-control stdin-input"
+                    [(ngModel)]="runTimeInputs"
+                    placeholder="Enter your input here..."
+                ></textarea>
+            </div>
+            <!--Output-Area-->
+            <div class="mb-3 result textarea-label">
+                <!--Compile-Clear Buttons -->
+                <div class="button-group mb-3 output-but">
+                    <button type="button" class="btn btn-primary">Clear</button>
+                    <button type="button" class="btn btn-secondary">Compile</button>
+                </div>
+                <label for="stdout-output" class="form-label">STDOUT:</label>
+                <textarea
+                    id="stdout-output"
+                    class="form-control stdout-output"
+                    readonly
+                    [(ngModel)]="stdoutOutput"
+                    placeholder="Output will appear here..."
+                ></textarea>
+            </div>
+        </div>
+    </div>
+</main>

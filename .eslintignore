@@ -1,0 +1,14 @@
+# Ignore all node_modules directories at any level
+**/node_modules/**
+
+# Ignore build and output directories
+/architecture
+**/dist/**
+**/build/**
+**/coverage/**
+**/tmp/**
+
+# Ignore IDE-specific files
+.vscode/
+.idea/
+.DS_Store

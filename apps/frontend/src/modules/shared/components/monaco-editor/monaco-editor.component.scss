@@ -1,0 +1,15 @@
+.editor-area {
+    height: 84vh;
+}
+/*Media Query*/
+
+@media (max-width: 767.98px) and (min-width: 576px) {
+    .editor-area {
+        height: auto !important;
+    }
+}
+@media (max-width: 575.98px) {
+    .editor-area {
+        height: 50vh !important;
+    }
+}
