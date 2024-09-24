@@ -145,11 +145,17 @@ export default (config: webpack.Configuration) => {
             use: ['style-loader', 'css-loader']
         },
         {
-            test: /\.(woff|woff2|eot|ttf|svg)$/,
-            type: 'asset/resource',
-            generator: {
-                filename: 'assets/fonts/[name].[hash][ext]'
-            }
+            test: /\.(woff|woff2|eot|ttf|otf)$/,
+            use: [
+                {
+                    loader: 'file-loader',
+                    options: {
+                        name: '[name].[hash].[ext]',
+                        outputPath: 'assets/fonts/',
+                        publicPath: 'assets/fonts/'
+                    }
+                }
+            ]
         }
     );
 
