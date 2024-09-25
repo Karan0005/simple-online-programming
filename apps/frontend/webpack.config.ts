@@ -1,12 +1,6 @@
-import dotenv from 'dotenv';
 import MonacoWebpackPlugin from 'monaco-editor-webpack-plugin';
 import { EditorFeature, NegatedEditorFeature } from 'monaco-editor/esm/metadata';
-import path from 'path';
-import TerserPlugin from 'terser-webpack-plugin';
 import * as webpack from 'webpack';
-
-// Setting environment variables from .env file
-dotenv.config({ path: path.resolve(process.env['PWD'] || process.cwd(), '.env') });
 
 // List of languages to include, constrained by EditorLanguage type
 const languages: Array<
@@ -141,17 +135,11 @@ export default (config: webpack.Configuration) => {
     config.ignoreWarnings = [
         {
             message: /CommonJS or AMD dependencies can cause optimization bailouts/
+        },
+        {
+            message: /"@charset" must be the first rule in the file/
         }
     ];
-
-    if (process.env['APP_ENV'] === 'PROD') {
-        config.optimization = {
-            minimize: true,
-            minimizer: [new TerserPlugin({ parallel: true })],
-            sideEffects: true,
-            usedExports: true
-        };
-    }
 
     return config;
 };
