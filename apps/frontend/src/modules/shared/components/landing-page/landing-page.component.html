@@ -1,6 +1,5 @@
-<header>
-    <div class="container">
-        <!-- First Section: Elegant Title -->
+<!-- <div class="container">
+
         <div class="header-left">
             <h1 class="title">Simplified Coding</h1>
         </div>
@@ -21,7 +20,7 @@
             </div>
         </div>
 
-        <!-- Third Section: Theme Toggle and Social Links -->
+       Third Section: Theme Toggle and Social Links
         <div class="header-right">
             <div>
                 <input
@@ -36,7 +35,7 @@
                     <span class="ball"></span>
                 </label>
             </div>
-            <!-- Social Media Links -->
+           Social Media Links
             <a href="https://github.com" target="_blank" class="btn" aria-label="GitHub">
                 <i class="bi bi-github"></i>
             </a>
@@ -44,8 +43,74 @@
                 <i class="bi bi-linkedin"></i>
             </a>
         </div>
+    </div> -->
+<nav class="navbar navbar-expand-lg bg-dark">
+    <div class="container-fluid">
+        <img src="../../../../assets/images/code.png" class="logo" />
+        <a class="navbar-brand" href="#">Simplified Coding</a>
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item me-4">
+                    <a class="nav-link active" aria-current="page" href="#">Home</a>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a
+                        class="nav-link dropdown-toggle"
+                        href="#"
+                        role="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                    >
+                        <div class="dropdown-selected" (click)="toggleDropdown()">
+                            <img [src]="'assets/logo/' + selectedLanguage.img" alt="" />
+                            {{ selectedLanguage.value }}
+                            <!-- <i class="fas fa-chevron-down"></i> -->
+                        </div>
+                    </a>
+                    <ul class="dropdown-menu" [ngClass]="{ show: dropdownOpen }">
+                        <li *ngFor="let language of languages" (click)="selectLanguage(language)">
+                            <img [src]="'assets/logo/' + language['img']" alt="" />
+                            {{ language['value'] }}
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <span class="navbar-social-links">
+                <div>
+                    <input
+                        type="checkbox"
+                        class="checkbox"
+                        id="checkbox"
+                        (change)="onThemeToggle($event)"
+                    />
+                    <label for="checkbox" class="checkbox-label">
+                        <i class="fas fa-moon"></i>
+                        <i class="fa-solid fa-sun"></i>
+                        <span class="ball"></span>
+                    </label>
+                </div>
+                <a href="https://github.com" target="_blank" class="btn" aria-label="GitHub">
+                    <i class="bi bi-github"></i>
+                </a>
+                <a href="https://linkedin.com" target="_blank" class="btn" aria-label="LinkedIn">
+                    <i class="bi bi-linkedin"></i>
+                </a>
+            </span>
+        </div>
     </div>
-</header>
+</nav>
 
 <main class="container mt-4 wrapper-area">
     <div class="row g-3">
