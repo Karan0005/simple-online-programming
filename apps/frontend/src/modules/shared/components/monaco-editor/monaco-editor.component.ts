@@ -88,21 +88,26 @@ export class MonacoEditorComponent implements AfterViewInit, OnChanges {
     private initializeEditor(): void {
         const initialLanguage = this.languageMapping[this.language] || 'javascript';
         const initialTheme = this.themeMapping[this.theme] || 'vs-dark';
+        const editorContainer = document.getElementById('editorContainer');
 
-        this.editor = monaco.editor.create(document.getElementById('editorContainer')!, {
-            value: this.defaultPrograms[initialLanguage] || '',
-            language: initialLanguage,
-            theme: initialTheme,
-            minimap: {
-                enabled: false // Disable the minimap
-            },
-            lineNumbers: 'on',
-            wordWrap: 'on', // Optional, manage text flow,
-            smoothScrolling: true
-        });
+        if (editorContainer) {
+            this.editor = monaco.editor.create(editorContainer, {
+                value: this.defaultPrograms[initialLanguage] || '',
+                language: initialLanguage,
+                theme: initialTheme,
+                minimap: {
+                    enabled: false // Disable the minimap
+                },
+                lineNumbers: 'on',
+                wordWrap: 'on', // Optional, manage text flow,
+                smoothScrolling: true
+            });
 
-        this.editor.onDidChangeModelContent(() => {
-            this.valueChange.emit(this.editor!.getValue());
-        });
+            this.editor.onDidChangeModelContent(() => {
+                if (this.editor) {
+                    this.valueChange.emit(this.editor.getValue());
+                }
+            });
+        }
     }
 }
