@@ -131,7 +131,8 @@ const updateProject = async () => {
                 '@angular-eslint/eslint-plugin-template@latest',
                 '@angular-eslint/template-parser@latest',
                 '@angular/compiler-cli@latest',
-                '@angular/language-service@latest'
+                '@angular/language-service@latest',
+                '@angular-builders/custom-webpack@latest'
             ],
             projectRoot
         );

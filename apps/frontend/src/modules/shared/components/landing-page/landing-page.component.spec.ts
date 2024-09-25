@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { provideHttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
@@ -11,7 +12,7 @@ describe('LandingPageComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [FormsModule],
+            imports: [CommonModule, FormsModule],
             declarations: [LandingPageComponent, MonacoEditorComponent],
             providers: [provideHttpClient(), RestApiService]
         }).compileComponents();

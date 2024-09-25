@@ -13,6 +13,8 @@ export default defineConfig({
             ciWebServerCommand: 'npx nx run frontend:serve-static',
             ciBaseUrl: 'http://localhost:4200'
         }),
-        baseUrl: 'http://localhost:4200'
+        baseUrl: 'http://localhost:4200',
+        defaultCommandTimeout: 20000,
+        pageLoadTimeout: 100000
     }
 });
