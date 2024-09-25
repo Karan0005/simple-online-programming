@@ -130,7 +130,7 @@ export default (config: webpack.Configuration) => {
             test: /\.ttf$/,
             type: 'asset/resource',
             generator: {
-                filename: '[name].[hash][ext]' // Use hashed filenames for cache busting
+                filename: '[name].[hash].[ext]' // Use hashed filenames for cache busting
             }
         }
     );
