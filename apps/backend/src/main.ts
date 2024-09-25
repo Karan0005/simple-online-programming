@@ -14,7 +14,7 @@ import { AppModule } from './modules/app.module';
 import { ExceptionProcessor, ResponseProcessor } from './utilities';
 
 async function bootstrap() {
-    //Setting Up Logger
+    //Setting Up Logger.
     const appLogger = WinstonModule.createLogger({
         format: winston.format.uncolorize(),
         transports: LoggerTransports
