@@ -1,0 +1,13 @@
+# Use an explicit node.js image
+FROM node:22.8.0
+
+# Install dependencies
+RUN apt-get update && \
+    apt-get install -y curl && \
+    curl -sL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs && \
+    npm install -g typescript && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set the working directory
+WORKDIR /app

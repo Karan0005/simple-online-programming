@@ -208,7 +208,7 @@ const getFilesToCreate = (projectType, entityName, moduleName) => {
             { dir: 'interfaces', name: 'index.ts' },
             { dir: 'interfaces', name: `${entityName}.interface.ts` },
             { dir: 'validators', name: 'index.ts' },
-            { dir: 'validators', name: `${entityName}.interface.ts` },
+            { dir: 'validators', name: `${entityName}.validator.ts` },
             { dir: 'swagger', name: 'index.ts' },
             { dir: 'swagger', name: `${entityName}.props.swagger.ts` }
         ];

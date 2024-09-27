@@ -1,7 +1,7 @@
+import { ControllerExceptionProcessor, HealthCheckSuccessResponse } from '@backend/utilities';
 import { BaseMessage } from '@full-stack-project/shared';
 import { Controller, Get } from '@nestjs/common';
 import { ApiExcludeEndpoint, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { ControllerExceptionProcessor, HealthCheckSuccessResponse } from '../utilities';
 import { IRootRouteResponse } from './app.interface';
 import { AppService } from './app.service';
 
