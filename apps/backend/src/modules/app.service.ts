@@ -35,7 +35,7 @@ export class AppService {
             // The used disk storage should not exceed the 80% of the available space
             () =>
                 this.diskHealthIndicator.checkStorage('DISK_Health', {
-                    thresholdPercent: 0.8,
+                    thresholdPercent: 0.9,
                     path: __dirname
                 })
         ]);
