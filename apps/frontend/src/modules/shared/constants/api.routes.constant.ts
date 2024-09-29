@@ -4,7 +4,7 @@ export const ApiRoute = {
     },
     Compiler: {
         V1: {
-            Compile: '/compiler/compile/v1'
+            Compile: '/compile/v1'
         }
     }
 };

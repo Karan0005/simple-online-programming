@@ -79,6 +79,9 @@ export const DateProcessor = {
     },
     GetDateTimeDifference(dateTimeType: DateTimeTypeEnum, firstDate: Date, secondDate: Date) {
         switch (dateTimeType) {
+            case DateTimeTypeEnum.MILLISECONDS: {
+                return moment(firstDate).diff(secondDate, DateTimeTypeEnum.MILLISECONDS);
+            }
             case DateTimeTypeEnum.SECONDS: {
                 return moment(firstDate).diff(secondDate, DateTimeTypeEnum.SECONDS);
             }
@@ -143,6 +146,11 @@ export const DateProcessor = {
     GetDateTimeSchedule(date: string, time: string) {
         const dateTime = moment(`${date}T${time}`);
         return dateTime.utc().toDate();
+    },
+
+    NicelyFormatMilliSeconds(milliseconds: number) {
+        const totalSeconds = milliseconds / 1000;
+        return totalSeconds.toFixed(3) + 's';
     }
 };
 

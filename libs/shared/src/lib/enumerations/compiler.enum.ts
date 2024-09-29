@@ -8,7 +8,7 @@ export enum ProgrammingLanguageEnum {
     TypeScript = 'TypeScript',
     Kotlin = 'Kotlin',
     PHP = 'PHP',
-    CSharp = 'C#',
+    CSharp = 'CSharp',
     Swift = 'Swift',
     R = 'R',
     Ruby = 'Ruby',
@@ -25,6 +25,6 @@ export enum ExecutionPowerEnum {
 
 export enum TimeOutEnum {
     TEN = 10,
-    TWENTY = 20,
-    THIRTY = 30
+    THIRTY = 30,
+    SIXTY = 60
 }

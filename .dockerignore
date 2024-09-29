@@ -8,6 +8,7 @@ build
 .angular
 .nx
 backup
+source-code
 
 # Nx cache and artifacts
 tmp

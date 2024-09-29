@@ -16,7 +16,7 @@ import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 })
 export class MonacoEditorComponent implements AfterViewInit, OnChanges {
     @Input() value = '';
-    @Input() language = 'JavaScript';
+    @Input() language = '';
     @Input() theme = 'dark';
     @Output() valueChange = new EventEmitter<string>();
     private editor: monaco.editor.IStandaloneCodeEditor | undefined;
@@ -31,30 +31,12 @@ export class MonacoEditorComponent implements AfterViewInit, OnChanges {
         Python: 'python',
         Go: 'go',
         PHP: 'php',
-        'C#': 'csharp',
+        CSharp: 'csharp',
         Swift: 'swift',
         R: 'r',
         Ruby: 'ruby',
         Rust: 'rust',
         Perl: 'perl'
-    };
-
-    private defaultPrograms: { [key: string]: string } = {
-        javascript: `console.log('Hello, world!');`,
-        typescript: `console.log('Hello, world!');`,
-        cpp: `#include <iostream>\n\nint main() {\n    std::cout << "Hello, world!" << std::endl;\n    return 0;\n}`,
-        c: `#include <stdio.h>\n\nint main() {\n    printf("Hello, world!\\n");\n    return 0;\n}`,
-        java: `public class HelloWorld {\n    public static void main(String[] args) {\n        System.out.println("Hello, world!");\n    }\n}`,
-        kotlin: `fun main() {\n    println("Hello, world!")\n}`,
-        python: `print('Hello, world!')`,
-        go: `package main\n\nimport "fmt"\n\nfunc main() {\n    fmt.Println("Hello, world!")\n}`,
-        php: `<?php\n    echo 'Hello, world!';\n?>`,
-        csharp: `using System;\n\nclass Program\n{\n    static void Main()\n    {\n        Console.WriteLine("Hello, world!");\n    }\n}`,
-        swift: `print("Hello, world!")`,
-        r: `cat("Hello, world!")`,
-        ruby: `puts 'Hello, world!'`,
-        rust: `fn main() {\n    println!("Hello, world!");\n}`,
-        perl: `print "Hello, world!\n";`
     };
 
     private themeMapping: { [key: string]: string } = {
@@ -73,7 +55,7 @@ export class MonacoEditorComponent implements AfterViewInit, OnChanges {
                 const model = this.editor.getModel();
                 if (newLanguage && model) {
                     monaco.editor.setModelLanguage(model, newLanguage);
-                    this.editor.setValue(this.defaultPrograms[newLanguage] || '');
+                    this.editor.setValue(this.value || '');
                 }
             }
             if (changes['theme'] && !changes['theme'].isFirstChange()) {
@@ -92,14 +74,14 @@ export class MonacoEditorComponent implements AfterViewInit, OnChanges {
 
         if (editorContainer) {
             this.editor = monaco.editor.create(editorContainer, {
-                value: this.defaultPrograms[initialLanguage] || '',
+                value: this.value || '',
                 language: initialLanguage,
                 theme: initialTheme,
                 minimap: {
-                    enabled: false // Disable the minimap
+                    enabled: false
                 },
                 lineNumbers: 'on',
-                wordWrap: 'on', // Optional, manage text flow,
+                wordWrap: 'on',
                 smoothScrolling: true
             });
 

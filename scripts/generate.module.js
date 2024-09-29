@@ -103,8 +103,7 @@ const generateModule = async () => {
         console.log(chalk.green(`Module ${moduleName} has been successfully scaffolded!`));
     } catch (error) {
         // Rollback in case of error
-        console.log(error);
-        // if (absoluteModulePath) fs.rmSync(absoluteModulePath, { recursive: true, force: true });
+        if (absoluteModulePath) fs.rmSync(absoluteModulePath, { recursive: true, force: true });
         console.error(chalk.red(`An error occurred: ${error.message}`));
     }
 };

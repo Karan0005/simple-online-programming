@@ -1,11 +1,17 @@
 export interface ICompileRequest {
     SourceCode: string;
-    RunTimeInputs: string;
+    RunTimeInput: string;
     ProgrammingLanguage: string;
     ExecutionPower: string;
     TimeOut: number;
 }
 
 export interface ICompileResponse {
-    Output: string;
+    CompilerVersion: string;
+    CompilationStatus: string;
+    ExecutionDetails: {
+        Output: string | null;
+        Errors: string | null;
+        ExecutionTime: string;
+    };
 }

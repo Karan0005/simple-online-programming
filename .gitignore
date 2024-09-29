@@ -90,3 +90,4 @@ src/**/*.js.map
 /coverage
 /testem.log
 /typings
+/source-code

@@ -14,7 +14,8 @@ export const BaseMessage = {
         InvalidDateTimeFormat: 'Invalid date time, format must be YYYY-MM-DDTHH:mm:ss.SSSZ',
         InvalidDateFormat: 'Invalid date, format must be YYYY-MM-DD',
         InvalidNumber: 'Invalid number value',
-        SecretKeyNotFound: 'Secret key not found'
+        SecretKeyNotFound: 'Secret key not found',
+        ExecutionFailed: 'Execution failed'
     },
     Success: {
         RootRoute: (environment: string) =>

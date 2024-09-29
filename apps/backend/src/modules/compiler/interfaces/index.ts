@@ -1,3 +1,15 @@
-import { ICompileCodeResponse, ICompilerController, ICompilerService } from './compile.interface';
+import {
+    ICompileCodeResponse,
+    ICompilerController,
+    ICompilerResourceConfig,
+    ICompilerService,
+    IProgrammingLanguageConfig
+} from './compile.interface';
 
-export { ICompileCodeResponse, ICompilerController, ICompilerService };
+export {
+    ICompileCodeResponse,
+    ICompilerController,
+    ICompilerResourceConfig,
+    ICompilerService,
+    IProgrammingLanguageConfig
+};

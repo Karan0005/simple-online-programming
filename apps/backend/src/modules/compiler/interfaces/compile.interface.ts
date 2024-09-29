@@ -12,8 +12,19 @@ export interface ICompileCodeResponse {
     CompilerVersion: string;
     CompilationStatus: string;
     ExecutionDetails: {
-        Output: string;
+        Output: string | null;
         Errors: string | null;
-        ExecutionTimeInSeconds: number;
+        ExecutionTime: string;
     };
+}
+
+export interface ICompilerResourceConfig {
+    RAM: number;
+    CPU: number;
+}
+
+export interface IProgrammingLanguageConfig {
+    ContainerImage: string;
+    SourceCodeFileName: string;
+    ExecutableCommand: string;
 }
