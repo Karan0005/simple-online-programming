@@ -191,7 +191,7 @@ jobs:
                         -e CLIENT_ID=${{ env.CLIENT_ID }} \
                         -e CLIENT_SECRET=${{ env.CLIENT_SECRET }} \
                         -v /var/run/docker.sock:/var/run/docker.sock \
-                        -v source-code-volume:/app/source-code \
+                        -v source_code_volume:/app/source-code \
                         ${{ secrets.DOCKER_USERNAME }}/backend:${{ env.DOCKER_TAG }}
 
                       # Check if the new container started successfully
@@ -221,7 +221,7 @@ jobs:
                             -e CLIENT_ID=${{ env.CLIENT_ID }} \
                             -e CLIENT_SECRET=${{ env.CLIENT_SECRET }} \
                             -v /var/run/docker.sock:/var/run/docker.sock \
-                            -v source-code-volume:/app/source-code \
+                            -v source_code_volume:/app/source-code \
                             ${{ secrets.DOCKER_USERNAME }}/backend:${{ env.DOCKER_TAG }}_backup
 
                           echo "Rolled back to the previous backend container."

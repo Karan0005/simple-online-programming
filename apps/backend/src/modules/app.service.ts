@@ -32,7 +32,7 @@ export class AppService {
             () => this.memoryHealthIndicator.checkHeap('HEAP_Memory', 300 * 1024 * 1024),
             // The process should not have more than 300MB RSS memory allocated
             () => this.memoryHealthIndicator.checkRSS('RSS_Memory', 300 * 1024 * 1024),
-            // The used disk storage should not exceed the 80% of the available space
+            // The used disk storage should not exceed the 90% of the available space
             () =>
                 this.diskHealthIndicator.checkStorage('DISK_Health', {
                     thresholdPercent: 0.9,
