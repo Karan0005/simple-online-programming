@@ -44,7 +44,8 @@
             </a>
         </div>
     </div> -->
-<nav class="navbar navbar-expand-lg bg-dark">
+
+<!-- <nav class="navbar navbar-expand-lg bg-dark">
     <div class="container-fluid">
         <img src="../../../../assets/images/code.png" class="logo" />
         <a class="navbar-brand" href="#">Simplified Coding</a>
@@ -76,7 +77,7 @@
                         <div class="dropdown-selected" (click)="toggleDropdown()">
                             <img [src]="'assets/logo/' + selectedLanguage.img" alt="" />
                             {{ selectedLanguage.value }}
-                            <!-- <i class="fas fa-chevron-down"></i> -->
+                             <i class="fas fa-chevron-down"></i>
                         </div>
                     </a>
                     <ul class="dropdown-menu" [ngClass]="{ show: dropdownOpen }">
@@ -114,7 +115,7 @@
 
 <main class="container mt-4 wrapper-area">
     <div class="row g-3">
-        <!-- Coding Area where user can do coding-->
+        Coding Area where user can do coding
         <div class="col-xxl-8 col-xl-8 col-lg-6 col-md-12 coding-area">
             <app-monaco-editor
                 [(value)]="sourceCode"
@@ -123,7 +124,7 @@
                 (valueChange)="onEditorChange($event)"
             ></app-monaco-editor>
         </div>
-        <!-- Input-Output Area where user can give input and check the output-->
+         Input-Output Area where user can give input and check the output
         <div class="col-xxl-4 col-xl-4 col-lg-6 col-md-12 form-area">
             <div class="form-fields">
                 <div class="mb-3">
@@ -147,7 +148,7 @@
                     </select>
                 </div>
             </div>
-            <!--Input Area-->
+            Input Area
             <div class="mb-3 input textarea-label">
                 <label for="stdin-input" class="form-label">STDIN:</label>
                 <textarea
@@ -157,9 +158,9 @@
                     placeholder="Enter your input here..."
                 ></textarea>
             </div>
-            <!--Output-Area-->
+            Output-Area
             <div class="mb-3 result textarea-label">
-                <!--Compile-Clear Buttons -->
+                Compile-Clear Buttons
                 <div class="button-group mb-3 output-but">
                     <button type="button" class="btn btn-primary">Clear</button>
                     <button type="button" class="btn btn-secondary">Compile</button>
@@ -175,4 +176,89 @@
             </div>
         </div>
     </div>
-</main>
+</main>-->
+
+<div class="page-wrapper">
+    <header>
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">
+                    <img src="../../../../assets/images/logo.png" alt="logo" />
+                    Simplified Coding
+                </a>
+                <button
+                    class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarScroll"
+                    aria-controls="navbarScroll"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation"
+                >
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarScroll">
+                    <ul
+                        class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll"
+                        style="--bs-scroll-height: 100px"
+                    >
+                        <li class="nav-item dropdown">
+                            <a
+                                class="nav-link dropdown-toggle"
+                                href="#"
+                                role="button"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
+                            >
+                                <div class="dropdown-selected" (click)="toggleDropdown()">
+                                    <img [src]="'assets/logo/' + selectedLanguage.img" alt="" />
+                                    {{ selectedLanguage.value }}
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu" [ngClass]="{ show: dropdownOpen }">
+                                <li
+                                    *ngFor="let language of languages"
+                                    (click)="selectLanguage(language)"
+                                >
+                                    <img [src]="'assets/logo/' + language['img']" alt="" />
+                                    {{ language['value'] }}
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="social-links">
+                        <a
+                            href="https://github.com"
+                            target="_blank"
+                            class="btn"
+                            aria-label="GitHub"
+                        >
+                            <i class="bi bi-github"></i> Github
+                        </a>
+                        <a
+                            href="https://linkedin.com"
+                            target="_blank"
+                            class="btn"
+                            aria-label="LinkedIn"
+                        >
+                            <i class="bi bi-linkedin"></i> Linkedin
+                        </a>
+                        <input
+                            type="checkbox"
+                            class="checkbox"
+                            id="checkbox"
+                            (change)="onThemeToggle($event)"
+                        />
+                        <label for="checkbox" class="checkbox-label theme">
+                            <i class="bi bi-moon-fill moon"></i>
+                            <i class="bi bi-sun-fill sun"></i>
+                            <span class="ball"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <section></section>
+</div>
