@@ -118,7 +118,7 @@
         Coding Area where user can do coding
         <div class="col-xxl-8 col-xl-8 col-lg-6 col-md-12 coding-area">
             <app-monaco-editor
-                [(value)]="sourceCode"
+                [(value)]="selectedLanguage.code"
                 [language]="selectedLanguage.value"
                 [theme]="selectedTheme"
                 (valueChange)="onEditorChange($event)"
@@ -132,7 +132,7 @@
                     <select
                         id="execution-power-select"
                         class="form-select"
-                        [(ngModel)]="executionPower"
+                        [(ngModel)]="compileRequest.ExecutionPower"
                     >
                         <option *ngFor="let power of executionPowers" [value]="power">
                             {{ power }}
@@ -141,8 +141,12 @@
                 </div>
                 <div class="mb-3">
                     <label for="timeout-select" class="form-label">Timeout:</label>
-                    <select id="timeout-select" class="form-select" [(ngModel)]="selectedTimeout">
-                        <option *ngFor="let timeout of timeouts" [value]="timeout['value']">
+                    <select
+                        id="timeout-select"
+                        class="form-select"
+                        [(ngModel)]="compileRequest.TimeOut"
+                    >
+                        <option *ngFor="let timeout of timeouts" [ngValue]="timeout['value']">
                             {{ timeout['label'] }}
                         </option>
                     </select>
@@ -154,7 +158,7 @@
                 <textarea
                     id="stdin-input"
                     class="form-control stdin-input"
-                    [(ngModel)]="runTimeInputs"
+                    [(ngModel)]="compileRequest.RunTimeInput"
                     placeholder="Enter your input here..."
                 ></textarea>
             </div>
@@ -163,14 +167,16 @@
                 Compile-Clear Buttons
                 <div class="button-group mb-3 output-but">
                     <button type="button" class="btn btn-primary">Clear</button>
-                    <button type="button" class="btn btn-secondary">Compile</button>
+                    <button type="button" class="btn btn-secondary" (click)="compile()">
+                        Compile
+                    </button>
                 </div>
                 <label for="stdout-output" class="form-label">STDOUT:</label>
                 <textarea
                     id="stdout-output"
                     class="form-control stdout-output"
                     readonly
-                    [(ngModel)]="stdoutOutput"
+                    [(ngModel)]="compileResult"
                     placeholder="Output will appear here..."
                 ></textarea>
             </div>

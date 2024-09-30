@@ -148,6 +148,25 @@ jobs:
                           echo "Docker is already installed."
                       fi
 
+                      # Function to create Docker volume if it does not exist
+                      create_volume_if_not_exists() {
+                          VOLUME_NAME="source_code_volume"
+                          if [[ $(docker volume ls -q -f name=^${VOLUME_NAME}$) ]]; then
+                              echo "Volume '${VOLUME_NAME}' already exists. Skipping creation."
+                          else
+                              echo "Creating volume '${VOLUME_NAME}'..."
+                              if docker volume create "${VOLUME_NAME}"; then
+                                  echo "Volume '${VOLUME_NAME}' created successfully."
+                              else
+                                  echo "Error: Failed to create volume '${VOLUME_NAME}'."
+                                  exit 1  # Exit with an error code
+                              fi
+                          fi
+                      }
+
+                      # Create volume if not exists
+                      create_volume_if_not_exists
+
                       # Pull the latest image
                       docker pull ${{ secrets.DOCKER_USERNAME }}/backend:${{ env.DOCKER_TAG }}
 
@@ -171,6 +190,8 @@ jobs:
                         -e TENANT_ID=${{ env.TENANT_ID }} \
                         -e CLIENT_ID=${{ env.CLIENT_ID }} \
                         -e CLIENT_SECRET=${{ env.CLIENT_SECRET }} \
+                        -v /var/run/docker.sock:/var/run/docker.sock \
+                        -v source_code_volume:/app/source-code \
                         ${{ secrets.DOCKER_USERNAME }}/backend:${{ env.DOCKER_TAG }}
 
                       # Check if the new container started successfully
@@ -199,6 +220,8 @@ jobs:
                             -e TENANT_ID=${{ env.TENANT_ID }} \
                             -e CLIENT_ID=${{ env.CLIENT_ID }} \
                             -e CLIENT_SECRET=${{ env.CLIENT_SECRET }} \
+                            -v /var/run/docker.sock:/var/run/docker.sock \
+                            -v source_code_volume:/app/source-code \
                             ${{ secrets.DOCKER_USERNAME }}/backend:${{ env.DOCKER_TAG }}_backup
 
                           echo "Rolled back to the previous backend container."

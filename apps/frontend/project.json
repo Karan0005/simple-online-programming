@@ -30,6 +30,11 @@
                         "glob": "**/*",
                         "input": "apps/frontend/src/assets",
                         "output": "assets"
+                    },
+                    {
+                        "glob": "**/*",
+                        "input": "node_modules/monaco-editor/min/vs/base/browser/ui/codicons/codicon",
+                        "output": "/"
                     }
                 ],
                 "styles": [

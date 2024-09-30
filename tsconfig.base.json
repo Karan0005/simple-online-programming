@@ -26,7 +26,8 @@
         "target": "ES2022",
         "module": "commonjs",
         "paths": {
-            "@full-stack-project/shared": ["libs/shared/src/index.ts"]
+            "@full-stack-project/shared": ["libs/shared/src/index.ts"],
+            "@backend/utilities": ["apps/backend/src/utilities/index.ts"]
         }
     },
     "exclude": [

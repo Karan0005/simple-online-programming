@@ -19,6 +19,9 @@ services:
         ports:
             - '${PORT_BACKEND}:${PORT_BACKEND}'
         privileged: true
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+            - source_code_volume:/app/source-code
     frontend:
         build:
             context: .
@@ -36,3 +39,7 @@ services:
             - '${PORT_FRONTEND}:${PORT_FRONTEND}'
         depends_on:
             - backend
+
+volumes:
+    source_code_volume:
+        name: source_code_volume

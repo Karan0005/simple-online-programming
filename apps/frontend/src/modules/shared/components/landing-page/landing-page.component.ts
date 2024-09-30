@@ -1,5 +1,6 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, ElementRef, HostListener } from '@angular/core';
-import { IBaseResponse } from '@full-stack-project/shared';
+import { BaseMessage, IBaseResponse } from '@full-stack-project/shared';
 import { ApiRoute } from '../../constants';
 import { ICompileRequest, ICompileResponse } from '../../interfaces';
 import { RestApiService } from '../../services';
@@ -10,40 +11,73 @@ import { RestApiService } from '../../services';
     styleUrls: ['./landing-page.component.scss']
 })
 export class LandingPageComponent {
-    selectedLanguage: { img: string; value: string } = {
-        img: 'javascript.svg',
-        value: 'JavaScript'
-    };
-    executionPower = 'medium';
-    selectedTimeout = 20;
-    runTimeInputs = '';
-    stdoutOutput = '';
-    themeIcon = '🌙';
-    selectedTheme = 'light';
-    languages: { img: string; value: string }[] = [
-        { img: 'javascript.svg', value: 'JavaScript' },
-        { img: 'typescript.svg', value: 'TypeScript' },
-        { img: 'cpp.svg', value: 'CPP' },
-        { img: 'c.svg', value: 'C' },
-        { img: 'java.svg', value: 'Java' },
-        { img: 'kotlin.svg', value: 'Kotlin' },
-        { img: 'python.svg', value: 'Python' },
-        { img: 'go.svg', value: 'Go' },
-        { img: 'php.svg', value: 'PHP' },
-        { img: 'csharp.svg', value: 'C#' },
-        { img: 'swift.svg', value: 'Swift' },
-        { img: 'r.svg', value: 'R' },
-        { img: 'ruby.svg', value: 'Ruby' },
-        { img: 'rust.svg', value: 'Rust' },
-        { img: 'perl.svg', value: 'Perl' }
+    languages: { img: string; value: string; code: string }[] = [
+        { img: 'javascript.svg', value: 'JavaScript', code: `console.log('Hello, world!');` },
+        {
+            img: 'typescript.svg',
+            value: 'TypeScript',
+            code: `console.log('Hello, world!');`
+        },
+        {
+            img: 'cpp.svg',
+            value: 'CPP',
+            code: `#include <iostream>\n\nint main() {\n    std::cout << "Hello, world!" << std::endl;\n    return 0;\n}`
+        },
+        {
+            img: 'c.svg',
+            value: 'C',
+            code: `#include <stdio.h>\n\nint main() {\n    printf("Hello, world!\\n");\n    return 0;\n}`
+        },
+        {
+            img: 'java.svg',
+            value: 'Java',
+            code: `public class HelloWorld {\n    public static void main(String[] args) {\n        System.out.println("Hello, world!");\n    }\n}`
+        },
+        {
+            img: 'kotlin.svg',
+            value: 'Kotlin',
+            code: `fun main() {\n    println("Hello, world!")\n}`
+        },
+        { img: 'python.svg', value: 'Python', code: `print('Hello, world!')` },
+        {
+            img: 'go.svg',
+            value: 'Go',
+            code: `package main\n\nimport "fmt"\n\nfunc main() {\n    fmt.Println("Hello, world!")\n}`
+        },
+        { img: 'php.svg', value: 'PHP', code: `<?php\n    echo 'Hello, world!';\n?>` },
+        {
+            img: 'csharp.svg',
+            value: 'CSharp',
+            code: `using System;\n\nclass Program\n{\n    static void Main()\n    {\n        Console.WriteLine("Hello, world!");\n    }\n}`
+        },
+        { img: 'swift.svg', value: 'Swift', code: `print("Hello, world!")` },
+        { img: 'r.svg', value: 'R', code: `cat("Hello, world!")` },
+        { img: 'ruby.svg', value: 'Ruby', code: `puts 'Hello, world!'` },
+        { img: 'rust.svg', value: 'Rust', code: `fn main() {\n    println!("Hello, world!");\n}` },
+        { img: 'perl.svg', value: 'Perl', code: `print "Hello, world!";` }
     ];
+    selectedLanguage: { img: string; value: string; code: string } = {
+        img: this.languages[0].img,
+        value: this.languages[0].value,
+        code: this.languages[0].code
+    };
     executionPowers: string[] = ['low', 'medium', 'high', 'extreme'];
     timeouts: { value: number; label: string }[] = [
         { value: 10, label: '10 Seconds' },
-        { value: 20, label: '20 Seconds' },
+        { value: 30, label: '30 Seconds' },
         { value: 60, label: '60 Seconds' }
     ];
-    sourceCode = '';
+    compileRequest: ICompileRequest = {
+        SourceCode: this.languages[0].code,
+        RunTimeInput: '',
+        ProgrammingLanguage: this.languages[0].value,
+        ExecutionPower: this.executionPowers[0],
+        TimeOut: this.timeouts[0].value
+    };
+    compileResult = '';
+
+    themeIcon = '🌙';
+    selectedTheme = 'light';
     dropdownOpen = false;
 
     constructor(private apiService: RestApiService, private elementReference: ElementRef) {}
@@ -52,15 +86,16 @@ export class LandingPageComponent {
         this.dropdownOpen = !this.dropdownOpen;
     }
 
-    selectLanguage(language: { img: string; value: string }) {
+    selectLanguage(language: { img: string; value: string; code: string }) {
         this.selectedLanguage = language;
+        this.compileRequest.ProgrammingLanguage = language.value;
         this.dropdownOpen = false;
     }
 
     @HostListener('document:click', ['$event'])
     clickOutside(event: MouseEvent) {
         if (!this.elementReference.nativeElement.contains(event.target)) {
-            this.dropdownOpen = false; // Close the dropdown if clicked outside
+            this.dropdownOpen = false;
         }
     }
     toggleTheme() {
@@ -70,34 +105,38 @@ export class LandingPageComponent {
     }
 
     onEditorChange(value: string): void {
-        this.sourceCode = value;
+        this.compileRequest.SourceCode = value;
     }
 
-    async compileAndRun(): Promise<void> {
-        const payload: ICompileRequest = {
-            SourceCode: this.sourceCode,
-            RunTimeInputs: this.runTimeInputs,
-            ProgrammingLanguage: this.selectedLanguage.value,
-            ExecutionPower: this.executionPower,
-            TimeOut: this.selectedTimeout
-        };
-        this.stdoutOutput = 'Compiling...';
-        const response: IBaseResponse<ICompileResponse> = await this.apiService.post<
-            ICompileRequest,
-            IBaseResponse<{ Output: string }>
-        >(ApiRoute.Compiler.V1.Compile, payload);
+    async compile(): Promise<void> {
+        this.compileResult = 'Compiling...';
 
-        this.stdoutOutput = response.Data.Output || response.Message || 'Unknown error occurred';
+        try {
+            const response: IBaseResponse<ICompileResponse> = await this.apiService.post<
+                ICompileRequest,
+                IBaseResponse<ICompileResponse>
+            >(ApiRoute.Compiler.V1.Compile, this.compileRequest);
+
+            this.compileResult =
+                response.Data.ExecutionDetails.Output ||
+                response.Data.ExecutionDetails.Errors ||
+                response.Message ||
+                BaseMessage.Error.SomethingWentWrong;
+        } catch (error) {
+            this.compileResult = (
+                (error as HttpErrorResponse).error as IBaseResponse<null>
+            ).Message;
+        }
     }
 
     // Method to toggle the dark theme
     onThemeToggle(event: Event) {
         const checkbox = event.target as HTMLInputElement;
         if (checkbox.checked) {
-            document.body.classList.add('dark'); // Add dark class if checked
+            document.body.classList.add('dark');
             this.selectedTheme = 'dark';
         } else {
-            document.body.classList.remove('dark'); // Remove dark class if not checked
+            document.body.classList.remove('dark');
             this.selectedTheme = 'light';
         }
     }

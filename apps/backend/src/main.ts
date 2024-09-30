@@ -1,20 +1,24 @@
 /* eslint-disable no-console */
-import { BaseMessage } from '@full-stack-project/shared';
+import { ExceptionProcessor, ResponseProcessor } from '@backend/utilities';
+import { BaseMessage, EnvironmentEnum } from '@full-stack-project/shared';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as cluster from 'cluster';
+import events from 'events';
 import * as express from 'express';
 import helmet from 'helmet';
 import { WinstonModule } from 'nest-winston';
+import * as os from 'os';
 import * as winston from 'winston';
 import { LoggerTransports, setupSecretValues } from './config';
+import { DockerService } from './docker/docker.service';
 import { AppModule } from './modules/app.module';
-import { ExceptionProcessor, ResponseProcessor } from './utilities';
 
 async function bootstrap() {
-    //Setting Up Logger
+    //Setting Up Logger.
     const appLogger = WinstonModule.createLogger({
         format: winston.format.uncolorize(),
         transports: LoggerTransports
@@ -109,6 +113,19 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, options);
     SwaggerModule.setup(routePrefix + '/swagger', app, document);
 
+    //Building up docker setup
+    try {
+        const dockerService = new DockerService(appLogger);
+        await dockerService.setupDockerImages();
+        appLogger.log('Docker images setup completed successfully.');
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            appLogger.log(`Error setting up Docker images: ${error.message}`);
+        } else {
+            appLogger.log(`Error setting up Docker images: ${String(error)}`);
+        }
+    }
+
     //Initiating Server
     const port = configService.get('server.port');
     await app.listen(port);
@@ -116,11 +133,55 @@ async function bootstrap() {
     return { appLogger, configService, routePrefix };
 }
 
-bootstrap()
-    .then(({ appLogger, configService, routePrefix }) => {
-        const apiBaseURL: string = configService.get('server.apiBaseURL') as string;
-        appLogger.log(BaseMessage.Success.BackendBootstrap(apiBaseURL + '/' + routePrefix));
-    })
-    .catch((error) => {
-        console.error(JSON.stringify(error));
+function setupGracefulShutdown(worker: cluster.Worker) {
+    // Graceful shutdown on SIGINT or SIGTERM
+    process.on('SIGINT', () => {
+        console.log(`Worker ${worker.process.pid} is shutting down...`);
+        worker.kill('SIGINT');
     });
+
+    process.on('SIGTERM', () => {
+        console.log(`Worker ${worker.process.pid} received SIGTERM, exiting...`);
+        worker.kill('SIGTERM');
+    });
+
+    worker.on('exit', (code, signal) => {
+        console.log(`Worker ${worker.process.pid} exited with code ${code} and signal ${signal}`);
+    });
+}
+
+if (cluster.default.isPrimary && process.env.APP_ENV !== EnvironmentEnum.LOCAL) {
+    // Get the number of CPUs, but allow for a configurable WORKER_COUNT
+    const numCPUs = os.cpus().length;
+    const workerCount = process.env.WORKER_COUNT ? parseInt(process.env.WORKER_COUNT, 10) : numCPUs;
+
+    // Set a higher limit globally for all EventEmitters
+    events.EventEmitter.defaultMaxListeners = numCPUs === 1 ? 2 : numCPUs;
+
+    console.log(
+        `Master process is running with PID ${process.pid}. Forking ${workerCount} workers...`
+    );
+
+    // Fork workers equal to WORKER_COUNT or number of CPUs
+    for (let i = 0; i < workerCount; i++) {
+        const worker = cluster.default.fork();
+        setupGracefulShutdown(worker);
+    }
+
+    // If a worker dies, log the event and fork a new worker
+    cluster.default.on('exit', (worker) => {
+        console.log(`Worker ${worker.process.pid} died. Starting a new worker...`);
+        const newWorker = cluster.default.fork();
+        setupGracefulShutdown(newWorker);
+    });
+} else {
+    // Each worker runs its own instance of the NestJS app
+    bootstrap()
+        .then(({ appLogger, configService, routePrefix }) => {
+            const apiBaseURL: string = configService.get('server.apiBaseURL') as string;
+            appLogger.log(BaseMessage.Success.BackendBootstrap(apiBaseURL + '/' + routePrefix));
+        })
+        .catch((error) => {
+            console.error(JSON.stringify(error));
+        });
+}

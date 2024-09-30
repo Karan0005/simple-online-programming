@@ -4,6 +4,7 @@ import { TerminusModule } from '@nestjs/terminus';
 import { environment } from '../config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { CompilerModule } from './compiler/compiler.module';
 
 @Module({
     imports: [
@@ -13,7 +14,8 @@ import { AppService } from './app.service';
             ignoreEnvFile: true,
             load: [environment]
         }),
-        TerminusModule
+        TerminusModule,
+        CompilerModule
     ],
     controllers: [AppController],
     providers: [AppService]

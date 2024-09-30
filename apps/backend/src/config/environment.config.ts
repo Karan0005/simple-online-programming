@@ -1,8 +1,8 @@
+import { IApplicationConfiguration, SecretManagerService } from '@backend/utilities';
 import { BaseMessage, EnvironmentEnum } from '@full-stack-project/shared';
 import { LoggerService } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
-import { IApplicationConfiguration, SecretManagerService } from '../utilities';
 
 // Setting environment variables from .env file
 dotenv.config({ path: path.resolve(process.env.PWD || process.cwd(), '.env') });
