@@ -8,7 +8,9 @@ import { CompileCodeValidator } from '../../validators';
 
 @Controller('compile')
 export class CompileController implements ICompilerController {
-    constructor(@Inject(InjectionType.CompilerService) private compilerService: ICompilerService) {}
+    constructor(
+        @Inject(InjectionType.CompilerService) private readonly compilerService: ICompilerService
+    ) {}
 
     @Post('/v1')
     @ApiOperation({ summary: 'Compile Code' })

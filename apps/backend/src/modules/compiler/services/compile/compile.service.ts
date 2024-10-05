@@ -20,7 +20,7 @@ import {
 import { ConfigFunctionForLanguages, ConfigFunctionWithSourceParsing } from '../../types';
 import { CompileCodeValidator } from '../../validators';
 
-const rootPath: string = path.resolve(process.env.PWD || process.cwd(), 'source-code');
+const rootPath: string = path.resolve(process.env.PWD ?? process.cwd(), 'source-code');
 
 @Injectable()
 export class CompileService implements ICompilerService {
@@ -135,7 +135,7 @@ export class CompileService implements ICompilerService {
         }
     }
 
-    private getProgrammingLanguageConfig = (
+    private readonly getProgrammingLanguageConfig = (
         params: CompileCodeValidator,
         uniqueId: string
     ): IProgrammingLanguageConfig => {
@@ -196,9 +196,9 @@ export class CompileService implements ICompilerService {
                     clearTimeout(timer);
                     resolve(res);
                 })
-                .catch((err) => {
+                .catch((error: Error) => {
                     clearTimeout(timer);
-                    reject(err);
+                    reject(error);
                 });
         });
     }

@@ -22,6 +22,6 @@ export class SecretManagerService {
          *
          * where client is the initialized class object of azure secret client
          */
-        return 'test-value';
+        return 'Welcome@1'; //This is just illustration, need to replace it with actual secret at runtime from key vault
     }
 }

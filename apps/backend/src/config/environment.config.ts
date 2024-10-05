@@ -5,7 +5,7 @@ import * as dotenv from 'dotenv';
 import * as path from 'path';
 
 // Setting environment variables from .env file
-dotenv.config({ path: path.resolve(process.env.PWD || process.cwd(), '.env') });
+dotenv.config({ path: path.resolve(process.env.PWD ?? process.cwd(), '.env') });
 
 let serverSecret: string | undefined;
 

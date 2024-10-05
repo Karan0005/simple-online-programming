@@ -21,11 +21,6 @@ async function ignite() {
             let command =
                 'npm run frontend:lint && npm run frontend:test && nx build frontend --configuration local --skip-nx-cache';
             switch (environment) {
-                case 'LOCAL': {
-                    command =
-                        'npm run frontend:lint && npm run frontend:test && nx build frontend --configuration local --skip-nx-cache';
-                    break;
-                }
                 case 'DEV': {
                     command =
                         'npm run frontend:lint && npm run frontend:test && nx build frontend --configuration dev --skip-nx-cache';

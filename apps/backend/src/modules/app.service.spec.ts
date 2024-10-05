@@ -22,7 +22,7 @@ describe('AppService', () => {
 
     describe('rootRoute', () => {
         it(`It should success, root route service`, async () => {
-            const response = await appService.rootRoute();
+            const response = appService.rootRoute();
             const environment = configService.get('server.env') ?? '';
             expect(response).toEqual({ Information: BaseMessage.Success.RootRoute(environment) });
         });

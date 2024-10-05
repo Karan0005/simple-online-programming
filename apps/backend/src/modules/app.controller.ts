@@ -7,13 +7,13 @@ import { AppService } from './app.service';
 
 @Controller()
 export class AppController {
-    constructor(private appService: AppService) {}
+    constructor(private readonly appService: AppService) {}
 
     @Get()
     @ApiExcludeEndpoint()
     async rootRoute(): Promise<IRootRouteResponse> {
         try {
-            return await this.appService.rootRoute();
+            return this.appService.rootRoute();
         } catch (error) {
             throw ControllerExceptionProcessor(error);
         }

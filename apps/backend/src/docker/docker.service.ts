@@ -7,7 +7,7 @@ const execAsync = promisify(exec);
 
 @Injectable()
 export class DockerService {
-    private logger: LoggerService;
+    private readonly logger: LoggerService;
     constructor(logger: LoggerService) {
         this.logger = logger;
     }

@@ -7,12 +7,12 @@ import { CONFIG } from '../../../config/config';
     providedIn: 'root'
 })
 export class RestApiService {
-    private apiBaseURL: string = CONFIG.apiUrl;
-    private httpOptions: HttpHeaders = new HttpHeaders({
+    private readonly apiBaseURL: string = CONFIG.apiUrl;
+    private readonly httpOptions: HttpHeaders = new HttpHeaders({
         'Content-Type': 'application/json'
     });
 
-    constructor(private http: HttpClient) {}
+    constructor(private readonly http: HttpClient) {}
 
     async get<Res>(apiRoute: string): Promise<Res> {
         return firstValueFrom(
