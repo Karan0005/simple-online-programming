@@ -1,91 +1,271 @@
-//Logo Size
-$nav-bgcolor: #303030;
-$nav-text: #fff;
-@mixin flex {
-    display: flex;
-    align-items: center;
+@import '../../../../variables.scss';
+
+/* Media query for screens smaller than 992px (large desktop breakpoint) */
+@media (max-width: 992px) {
+    .navbar-brand {
+        .navbar-title {
+            display: none; // Hide the navbar title on screens smaller than 992px
+        }
+    }
+    .editor-area {
+        .editor {
+            height: 50vh !important; // Adjust editor height for smaller screens
+        }
+    }
 }
-header {
-    background-color: $nav-bgcolor;
 
-    img {
-        width: 50px;
+/* Media query for screens smaller than 576px (phone breakpoint) */
+@media (max-width: 576px) {
+    .dropdown {
+        .dropdown-toggle {
+            width: 200px !important;
+            padding: 5px; // Style dropdown button for smaller screens
+        }
+        .dropdown-menu {
+            max-height: 200px;
+            width: 200px !important;
+            padding: 0; // Adjust dropdown menu size for smaller screens
+        }
     }
-    a {
-        color: $nav-text;
+    .navbar {
+        div:nth-child(1) {
+            padding: 0; // Remove padding on small screens
+        }
+        .navbar-brand {
+            display: none !important; // Hide navbar brand
+        }
+        .navbar-nav {
+            .github,
+            .linkedin {
+                display: none; // Hide GitHub and LinkedIn icons on small screens
+            }
+        }
     }
-    ul {
+}
+
+/* Navbar styling for navigation bar */
+.navbar {
+    padding: 1rem;
+    box-shadow: $box-shadow;
+    background-color: $nav-color !important;
+    height: 7%;
+
+    .navbar-logo {
+        width: 40px;
+        height: auto; // Set size for the logo in the navbar
+    }
+
+    .navbar-title {
+        font-size: 1.5rem;
+        color: #ffffff; // Styling for navbar title text
+    }
+
+    .dropdown-menu {
+        box-shadow: $box-shadow; // Add shadow to dropdown menu
+    }
+
+    .navbar-collapse {
+        flex-grow: unset !important; // Prevent navbar from expanding
+    }
+
+    .navbar-toggler:focus {
+        box-shadow: none; // Remove box-shadow on focus
+    }
+
+    .navbar-nav {
+        display: flex;
+        align-items: center;
+        flex-direction: row; // Align navbar items in a row
+        a {
+            border: none;
+            color: #fff; // Style for navbar links
+
+            i {
+                margin-right: 5px; // Spacing for icons
+            }
+        }
+    }
+}
+/* Language dropdown for selecting programming languages */
+.dropdown {
+    .dropdown-toggle {
+        width: 300px;
+        color: #fff;
+        padding: 7px;
+        border: 1px solid #fff;
+        border-radius: 2px !important; // Style for dropdown button
+    }
+
+    .dropdown-toggle::after {
+        position: absolute;
+        right: 10px;
+        font-size: 20px; // Icon inside the dropdown toggle button
+    }
+
+    .dropdown-menu {
+        overflow-y: auto;
+        max-height: 300px;
+        width: 300px;
+        padding: 0; // Style for dropdown menu and items
+
         li {
-            a {
-                border: 1px solid #6e6e6e;
-                width: 250px;
-                padding: 5px;
-                border-radius: 2px;
-                @include flex;
-                justify-content: space-between;
-                color: $nav-text;
-            }
-            ul {
-                height: 300px;
-                overflow-y: auto;
-                width: 100%;
-                margin-left: 0px;
-                background: #484848;
-                scrollbar-color: #6292f7 #292929;
-                scrollbar-width: thin;
-                scroll-behavior: smooth;
-                li {
-                    margin: 10px;
-                    color: #fff;
-                    border-bottom: 1px solid #666666;
-                    img {
-                        width: 30px;
-                        margin-bottom: 5px;
-                    }
-                }
-            }
-            .dropdown-selected {
-                display: flex;
-                align-items: center;
-                img {
-                    width: 30px;
-                    margin-right: 10px;
-                }
+            border-bottom: 1px solid #656565;
+            background: #515151;
+
+            button {
+                color: #fff;
+                padding: 10px 15px; // Style for buttons inside dropdown items
             }
         }
     }
-    .social-links {
-        @include flex;
-        .theme {
-            background-color: #111;
-            width: 52px;
-            height: 28px;
-            border-radius: 50px;
-            position: relative;
-            padding: 4px !important;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 5px;
-            .ball {
-                background-color: #fff;
-                width: 20px;
-                height: 20px;
-                position: absolute;
-                border-radius: 50%;
-                transition: transform 0.2s linear;
+
+    .dropdown-icon {
+        width: 25px;
+        height: 25px; // Style for the dropdown icon
+    }
+
+    .dropdown-item:hover,
+    .dropdown-item:focus {
+        background-color: $nav-color; // Hover and focus styles for dropdown items
+    }
+}
+
+/* Editor area styling */
+.editor-area {
+    height: 93%; // Full height for the editor area
+
+    .row {
+        height: 100%; // Ensure the row takes full height
+    }
+
+    .code-editor {
+        height: 100%; // Full height for the code editor container
+    }
+
+    .editor {
+        height: 87vh;
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+        margin-top: 3vh;
+        margin-bottom: 3vh; // Margin around the editor
+
+        .monaco-editor {
+            height: 100% !important;
+            overflow: hidden !important; // Hide scroll in the Monaco editor
+
+            .scrollable-element {
+                overflow-y: hidden !important;
+                overflow-x: hidden !important; // Prevent scroll bars in editor
             }
-            .sun {
-                color: #ffc166;
-            }
-            .moon {
-                color: #dbdbdb;
+        }
+    }
+}
+
+/* Code settings form styling */
+.code-setting {
+    form {
+        background-color: transparent;
+        display: flex;
+        height: 93vh;
+        border: none;
+        padding-bottom: 1.5rem !important;
+        padding-top: 1.5rem !important; // Form layout and padding
+        textarea:focus {
+            box-shadow: none;
+        }
+        .row:nth-child(1) {
+            height: auto;
+
+            div {
+                padding: 0px 12px; // Padding for input fields
             }
         }
 
-        i {
-            font-size: 18px;
+        .input {
+            textarea {
+                background: transparent; // Transparent background for textarea
+            }
+        }
+
+        .output {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1; // Full height for the output textarea
+
+            textarea {
+                display: flex;
+                flex-grow: 1;
+                background: transparent; // Transparent background for output textarea
+            }
+        }
+
+        .form-label {
+            margin: 0;
+            font-weight: 500;
+            color: #495057; // Styling for form labels
+        }
+
+        .form-select,
+        .form-control {
+            border: 1px solid #d0d0d0;
+            border-radius: 2px !important;
+            background: transparent; // Transparent background for form controls
+        }
+
+        .form-select {
+            appearance: none;
+            background-image: url('../../../../assets/images/arrow-down.png'); // Custom downward caret for select
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 0.6rem;
+            padding-right: 2rem; // Custom arrow icon in select input
+        }
+
+        .form-select:hover {
+            cursor: pointer;
+        }
+
+        .form-select:focus {
+            box-shadow: none; // Remove focus shadow
+        }
+
+        .form-control:hover {
+            border-color: $secondary-color; // Hover effect for form controls
+        }
+
+        .btn-primary {
+            padding: $btn-padding;
+            background-color: $primary-color;
+            border-radius: 2px !important; // Primary button styling
+
+            &:hover {
+                background-color: darken($primary-color, 10%); // Darken on hover
+            }
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between; // Flex layout for execution power and timeout section
+
+            .col-6 {
+                padding: 0 5px; // Padding for the columns
+            }
         }
     }
+}
+
+/* Button hover and transition effects */
+button,
+.btn {
+    transition: background-color 0.3s ease, color 0.3s ease; // Transition effect for buttons
+
+    &:hover {
+        cursor: pointer; // Change cursor on hover
+    }
+}
+
+/* Disable resizing for text areas */
+.no-resize {
+    resize: none; // Disable text area resizing
 }

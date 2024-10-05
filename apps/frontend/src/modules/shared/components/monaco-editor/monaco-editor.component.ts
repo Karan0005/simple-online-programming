@@ -21,7 +21,7 @@ export class MonacoEditorComponent implements AfterViewInit, OnChanges {
     @Output() valueChange = new EventEmitter<string>();
     private editor: monaco.editor.IStandaloneCodeEditor | undefined;
 
-    private languageMapping: { [key: string]: string } = {
+    private readonly languageMapping: { [key: string]: string } = {
         JavaScript: 'javascript',
         TypeScript: 'typescript',
         CPP: 'cpp',
@@ -39,7 +39,7 @@ export class MonacoEditorComponent implements AfterViewInit, OnChanges {
         Perl: 'perl'
     };
 
-    private themeMapping: { [key: string]: string } = {
+    private readonly themeMapping: { [key: string]: string } = {
         dark: 'vs-dark',
         light: 'vs'
     };
@@ -82,7 +82,8 @@ export class MonacoEditorComponent implements AfterViewInit, OnChanges {
                 },
                 lineNumbers: 'on',
                 wordWrap: 'on',
-                smoothScrolling: true
+                smoothScrolling: true,
+                automaticLayout: true
             });
 
             this.editor.onDidChangeModelContent(() => {

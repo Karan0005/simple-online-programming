@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, ElementRef, HostListener } from '@angular/core';
+import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { BaseMessage, IBaseResponse } from '@full-stack-project/shared';
 import { ApiRoute } from '../../constants';
 import { ICompileRequest, ICompileResponse } from '../../interfaces';
@@ -76,11 +76,13 @@ export class LandingPageComponent {
     };
     compileResult = '';
 
-    themeIcon = '🌙';
     selectedTheme = 'light';
     dropdownOpen = false;
 
-    constructor(private apiService: RestApiService, private elementReference: ElementRef) {}
+    // ViewChild to target dropdown
+    @ViewChild('dropdownMenu', { static: false }) dropdownMenu!: ElementRef;
+
+    constructor(private readonly apiService: RestApiService) {}
 
     toggleDropdown() {
         this.dropdownOpen = !this.dropdownOpen;
@@ -94,50 +96,39 @@ export class LandingPageComponent {
 
     @HostListener('document:click', ['$event'])
     clickOutside(event: MouseEvent) {
-        if (!this.elementReference.nativeElement.contains(event.target)) {
+        if (this.dropdownMenu && !this.dropdownMenu.nativeElement.contains(event.target)) {
             this.dropdownOpen = false;
         }
-    }
-    toggleTheme() {
-        this.selectedTheme = this.selectedTheme === 'light' ? 'dark' : 'light';
-        document.body.classList.toggle('dark-theme');
-        this.themeIcon = this.themeIcon === '🌙' ? '☀️' : '🌙';
     }
 
     onEditorChange(value: string): void {
         this.compileRequest.SourceCode = value;
     }
 
+    toggleTheme() {
+        document.body.classList.toggle('dark');
+        this.selectedTheme = this.selectedTheme === 'dark' ? 'light' : 'dark';
+    }
+
     async compile(): Promise<void> {
         this.compileResult = 'Compiling...';
 
         try {
+            this.compileRequest.TimeOut = +this.compileRequest.TimeOut;
             const response: IBaseResponse<ICompileResponse> = await this.apiService.post<
                 ICompileRequest,
                 IBaseResponse<ICompileResponse>
             >(ApiRoute.Compiler.V1.Compile, this.compileRequest);
 
             this.compileResult =
-                response.Data.ExecutionDetails.Output ||
-                response.Data.ExecutionDetails.Errors ||
-                response.Message ||
+                (response.Data.ExecutionDetails.Output ??
+                    response.Data.ExecutionDetails.Errors ??
+                    response.Message) ||
                 BaseMessage.Error.SomethingWentWrong;
         } catch (error) {
             this.compileResult = (
                 (error as HttpErrorResponse).error as IBaseResponse<null>
             ).Message;
-        }
-    }
-
-    // Method to toggle the dark theme
-    onThemeToggle(event: Event) {
-        const checkbox = event.target as HTMLInputElement;
-        if (checkbox.checked) {
-            document.body.classList.add('dark');
-            this.selectedTheme = 'dark';
-        } else {
-            document.body.classList.remove('dark');
-            this.selectedTheme = 'light';
         }
     }
 }

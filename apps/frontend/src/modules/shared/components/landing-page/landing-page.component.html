@@ -1,270 +1,162 @@
-<!-- <div class="container">
+<!-- Navbar Header Section -->
+<header class="navbar navbar-expand-lg navbar-light bg-light px-3 py-2 shadow-sm">
+    <div class="container-fluid d-flex align-items-center">
+        <!-- Logo and Title Section -->
+        <a class="navbar-brand d-flex align-items-center">
+            <!-- Company Logo -->
+            <img src="assets/images/logo.png" alt="Company Logo" class="navbar-logo me-2" />
+            <!-- Site Title -->
+            <span class="navbar-title">Simplified Coding</span>
+        </a>
 
-        <div class="header-left">
-            <h1 class="title">Simplified Coding</h1>
-        </div>
-
-        <div class="header-center">
-            <div class="custom-dropdown">
-                <div class="dropdown-selected" (click)="toggleDropdown()">
-                    <img [src]="'assets/logo/' + selectedLanguage.img" alt="" />
-                    {{ selectedLanguage.value }}
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <ul class="dropdown-list" [ngClass]="{ show: dropdownOpen }">
-                    <li *ngFor="let language of languages" (click)="selectLanguage(language)">
-                        <img [src]="'assets/logo/' + language['img']" alt="" />
-                        {{ language['value'] }}
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-       Third Section: Theme Toggle and Social Links
-        <div class="header-right">
-            <div>
-                <input
-                    type="checkbox"
-                    class="checkbox"
-                    id="checkbox"
-                    (change)="onThemeToggle($event)"
+        <!-- Language Selection Dropdown -->
+        <div #dropdownMenu class="dropdown me-3">
+            <button
+                class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center"
+                (click)="toggleDropdown()"
+            >
+                <!-- Display Selected Language Icon and Name -->
+                <img
+                    [src]="'assets/logo/' + selectedLanguage.img"
+                    alt="{{ selectedLanguage.value }}"
+                    class="me-1 dropdown-icon"
                 />
-                <label for="checkbox" class="checkbox-label">
-                    <i class="fas fa-moon"></i>
-                    <i class="fas fa-sun"></i>
-                    <span class="ball"></span>
-                </label>
-            </div>
-           Social Media Links
-            <a href="https://github.com" target="_blank" class="btn" aria-label="GitHub">
-                <i class="bi bi-github"></i>
-            </a>
-            <a href="https://linkedin.com" target="_blank" class="btn" aria-label="LinkedIn">
-                <i class="bi bi-linkedin"></i>
-            </a>
-        </div>
-    </div> -->
-
-<!-- <nav class="navbar navbar-expand-lg bg-dark">
-    <div class="container-fluid">
-        <img src="../../../../assets/images/code.png" class="logo" />
-        <a class="navbar-brand" href="#">Simplified Coding</a>
-        <button
-            class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-        >
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item me-4">
-                    <a class="nav-link active" aria-current="page" href="#">Home</a>
-                </li>
-
-                <li class="nav-item dropdown">
-                    <a
-                        class="nav-link dropdown-toggle"
-                        href="#"
-                        role="button"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                    >
-                        <div class="dropdown-selected" (click)="toggleDropdown()">
-                            <img [src]="'assets/logo/' + selectedLanguage.img" alt="" />
-                            {{ selectedLanguage.value }}
-                             <i class="fas fa-chevron-down"></i>
-                        </div>
-                    </a>
-                    <ul class="dropdown-menu" [ngClass]="{ show: dropdownOpen }">
-                        <li *ngFor="let language of languages" (click)="selectLanguage(language)">
-                            <img [src]="'assets/logo/' + language['img']" alt="" />
-                            {{ language['value'] }}
-                        </li>
-                    </ul>
+                {{ selectedLanguage.value }}
+            </button>
+            <!-- Dropdown Menu for Language Options -->
+            <ul class="dropdown-menu" [ngClass]="{ show: dropdownOpen }">
+                <li *ngFor="let language of languages">
+                    <!-- Option to Select a Language -->
+                    <button class="dropdown-item" (click)="selectLanguage(language)">
+                        <img
+                            [src]="'assets/logo/' + language.img"
+                            alt="{{ language.value }}"
+                            class="me-1 dropdown-icon"
+                        />
+                        {{ language.value }}
+                    </button>
                 </li>
             </ul>
-            <span class="navbar-social-links">
-                <div>
-                    <input
-                        type="checkbox"
-                        class="checkbox"
-                        id="checkbox"
-                        (change)="onThemeToggle($event)"
-                    />
-                    <label for="checkbox" class="checkbox-label">
-                        <i class="fas fa-moon"></i>
-                        <i class="fa-solid fa-sun"></i>
+        </div>
+
+        <!-- Icons Section (GitHub, LinkedIn, and Theme Toggle) -->
+        <div>
+            <ul class="navbar-nav ms-auto">
+                <!-- GitHub Icon Button -->
+                <li class="nav-item github">
+                    <a class="nav-link" href="https://github.com/Karan0005" target="_blank">
+                        <i class="bi bi-github"></i
+                    ></a>
+                </li>
+                <!-- LinkedIn Icon Button -->
+                <li class="nav-item linkedin ps-2">
+                    <a
+                        class="nav-link"
+                        href="https://www.linkedin.com/in/karangupta0005"
+                        target="_blank"
+                        ><i class="bi bi-linkedin"></i
+                    ></a>
+                </li>
+                <!-- Theme Toggle Button -->
+                <li class="nav-item ps-2">
+                    <button class="toggle-button" id="toggle-button" (click)="toggleTheme()">
+                        <i class="bi bi-moon-fill moon"></i>
+                        <i class="bi bi-brightness-high-fill sun"></i>
                         <span class="ball"></span>
-                    </label>
-                </div>
-                <a href="https://github.com" target="_blank" class="btn" aria-label="GitHub">
-                    <i class="bi bi-github"></i>
-                </a>
-                <a href="https://linkedin.com" target="_blank" class="btn" aria-label="LinkedIn">
-                    <i class="bi bi-linkedin"></i>
-                </a>
-            </span>
+                    </button>
+                </li>
+            </ul>
         </div>
     </div>
-</nav>
+</header>
 
-<main class="container mt-4 wrapper-area">
-    <div class="row g-3">
-        Coding Area where user can do coding
-        <div class="col-xxl-8 col-xl-8 col-lg-6 col-md-12 coding-area">
+<!-- Main Editor Area -->
+<main class="container-fluid editor-area">
+    <div class="row">
+        <!-- Code Editor Section (Left) -->
+        <section class="col-lg-8 col-md-12 mb-4 code-editor">
+            <!-- Monaco Editor Component for Code Input -->
             <app-monaco-editor
                 [(value)]="selectedLanguage.code"
                 [language]="selectedLanguage.value"
                 [theme]="selectedTheme"
                 (valueChange)="onEditorChange($event)"
+                class="editor"
             ></app-monaco-editor>
-        </div>
-         Input-Output Area where user can give input and check the output
-        <div class="col-xxl-4 col-xl-4 col-lg-6 col-md-12 form-area">
-            <div class="form-fields">
-                <div class="mb-3">
-                    <label for="execution-power-select" class="form-label">Execution Power:</label>
-                    <select
-                        id="execution-power-select"
-                        class="form-select"
-                        [(ngModel)]="compileRequest.ExecutionPower"
-                    >
-                        <option *ngFor="let power of executionPowers" [value]="power">
-                            {{ power }}
-                        </option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="timeout-select" class="form-label">Timeout:</label>
-                    <select
-                        id="timeout-select"
-                        class="form-select"
-                        [(ngModel)]="compileRequest.TimeOut"
-                    >
-                        <option *ngFor="let timeout of timeouts" [ngValue]="timeout['value']">
-                            {{ timeout['label'] }}
-                        </option>
-                    </select>
-                </div>
-            </div>
-            Input Area
-            <div class="mb-3 input textarea-label">
-                <label for="stdin-input" class="form-label">STDIN:</label>
-                <textarea
-                    id="stdin-input"
-                    class="form-control stdin-input"
-                    [(ngModel)]="compileRequest.RunTimeInput"
-                    placeholder="Enter your input here..."
-                ></textarea>
-            </div>
-            Output-Area
-            <div class="mb-3 result textarea-label">
-                Compile-Clear Buttons
-                <div class="button-group mb-3 output-but">
-                    <button type="button" class="btn btn-primary">Clear</button>
-                    <button type="button" class="btn btn-secondary" (click)="compile()">
-                        Compile
-                    </button>
-                </div>
-                <label for="stdout-output" class="form-label">STDOUT:</label>
-                <textarea
-                    id="stdout-output"
-                    class="form-control stdout-output"
-                    readonly
-                    [(ngModel)]="compileResult"
-                    placeholder="Output will appear here..."
-                ></textarea>
-            </div>
-        </div>
-    </div>
-</main>-->
+        </section>
 
-<div class="page-wrapper">
-    <header>
-        <nav class="navbar navbar-expand-lg">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="#">
-                    <img src="../../../../assets/images/logo.png" alt="logo" />
-                    Simplified Coding
-                </a>
-                <button
-                    class="navbar-toggler"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#navbarScroll"
-                    aria-controls="navbarScroll"
-                    aria-expanded="false"
-                    aria-label="Toggle navigation"
-                >
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarScroll">
-                    <ul
-                        class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll"
-                        style="--bs-scroll-height: 100px"
-                    >
-                        <li class="nav-item dropdown">
-                            <a
-                                class="nav-link dropdown-toggle"
-                                href="#"
-                                role="button"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false"
+        <!-- Code Settings and Output Section (Right) -->
+        <aside class="col-lg-4 col-md-12 code-setting">
+            <form class="card p-2">
+                <!-- Execution Power and Timeout Selection Fields -->
+                <div class="row">
+                    <!-- Execution Power Dropdown -->
+                    <div class="col-6 mb-3">
+                        <label for="executionPowerDropdown" class="form-label"
+                            >Execution Power</label
+                        >
+                        <select
+                            class="form-select"
+                            id="executionPowerDropdown"
+                            name="executionPowerDropdown"
+                            [(ngModel)]="compileRequest.ExecutionPower"
+                        >
+                            <!-- Dynamically populated options for execution power -->
+                            <option
+                                *ngFor="let executionPower of executionPowers"
+                                [value]="executionPower"
                             >
-                                <div class="dropdown-selected" (click)="toggleDropdown()">
-                                    <img [src]="'assets/logo/' + selectedLanguage.img" alt="" />
-                                    {{ selectedLanguage.value }}
-                                    <i class="fas fa-chevron-down"></i>
-                                </div>
-                            </a>
-                            <ul class="dropdown-menu" [ngClass]="{ show: dropdownOpen }">
-                                <li
-                                    *ngFor="let language of languages"
-                                    (click)="selectLanguage(language)"
-                                >
-                                    <img [src]="'assets/logo/' + language['img']" alt="" />
-                                    {{ language['value'] }}
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                    <div class="social-links">
-                        <a
-                            href="https://github.com"
-                            target="_blank"
-                            class="btn"
-                            aria-label="GitHub"
+                                {{ executionPower }}
+                            </option>
+                        </select>
+                    </div>
+                    <!-- Timeout Dropdown -->
+                    <div class="col-6 mb-3">
+                        <label for="timeoutDropdown" class="form-label">Timeout</label>
+                        <select
+                            class="form-select"
+                            id="timeoutDropdown"
+                            name="timeoutDropdown"
+                            [(ngModel)]="compileRequest.TimeOut"
                         >
-                            <i class="bi bi-github"></i> Github
-                        </a>
-                        <a
-                            href="https://linkedin.com"
-                            target="_blank"
-                            class="btn"
-                            aria-label="LinkedIn"
-                        >
-                            <i class="bi bi-linkedin"></i> Linkedin
-                        </a>
-                        <input
-                            type="checkbox"
-                            class="checkbox"
-                            id="checkbox"
-                            (change)="onThemeToggle($event)"
-                        />
-                        <label for="checkbox" class="checkbox-label theme">
-                            <i class="bi bi-moon-fill moon"></i>
-                            <i class="bi bi-sun-fill sun"></i>
-                            <span class="ball"></span>
-                        </label>
+                            <!-- Dynamically populated options for timeout -->
+                            <option *ngFor="let timeout of timeouts" [value]="timeout.value">
+                                {{ timeout.label }}
+                            </option>
+                        </select>
                     </div>
                 </div>
-            </div>
-        </nav>
-    </header>
-    <section></section>
-</div>
+
+                <!-- Runtime Input Textarea -->
+                <div class="mb-3 input">
+                    <label for="runtimeInputs" class="form-label">Runtime Input</label>
+                    <textarea
+                        name="runtimeInputs"
+                        id="runtimeInputs"
+                        rows="4"
+                        class="form-control no-resize"
+                        placeholder="Enter your Input Here..."
+                        [(ngModel)]="compileRequest.RunTimeInput"
+                    ></textarea>
+                </div>
+
+                <!-- Output Textarea -->
+                <div class="mb-3 output">
+                    <label for="output" class="form-label">Output</label>
+                    <textarea
+                        name="output"
+                        id="output"
+                        rows="4"
+                        class="form-control no-resize"
+                        [(ngModel)]="compileResult"
+                    ></textarea>
+                </div>
+
+                <!-- Compile Button -->
+                <button type="submit" class="btn btn-primary w-100" (click)="compile()">
+                    Compile
+                </button>
+            </form>
+        </aside>
+    </div>
+</main>

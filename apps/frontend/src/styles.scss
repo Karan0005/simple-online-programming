@@ -1,122 +1,111 @@
-/* You can add global styles to this file, and also import other style files */
-@import '~monaco-editor/min/vs/editor/editor.main.css';
-/* You can add global styles to this file, and also import other style files */
-@import './variables.scss';
+/* Importing Monaco Editor styles and variable settings */
+@import '~monaco-editor/min/vs/editor/editor.main.css'; // Import Monaco Editor core styles
+@import './variables.scss'; // Import your custom variables (like colors, fonts, etc.)
 
+/* Font imports */
 @font-face {
     font-family: 'Roboto', Arial, sans-serif;
     src: url('assets/fonts/roboto/bold.ttf') format('truetype'),
+        // Bold font variant
         url('assets/fonts/roboto/light.ttf') format('truetype'),
+        // Light font variant
         url('assets/fonts/roboto/medium.ttf') format('truetype'),
+        // Medium font variant
         url('assets/fonts/roboto/regular.ttf') format('truetype'),
-        url('assets/fonts/roboto/thin.ttf') format('truetype');
+        // Regular font variant
+        url('assets/fonts/roboto/thin.ttf') format('truetype'); // Thin font variant
 }
 
+/* General reset for border-radius globally */
 * {
-    box-sizing: border-box !important;
+    border-radius: 0 !important; // Disable rounded corners globally
+    box-sizing: border-box; /* Ensure consistent box-sizing across elements */
 }
 
-.checkbox {
-    opacity: 0;
-    position: absolute;
+/* General body styles */
+body {
+    font-family: $roboto-font-family; // Apply Roboto font globally
+    color: $primary-text-color; // Primary text color
+    overflow-y: hidden; // Disable vertical scroll for full-page layout
+    height: 100%; // Set height to 100% of viewport
+    background-color: $background-light; // Default background for light mode
+
+    /* Dark theme overrides */
+    &.dark {
+        background-color: $background-dark; // Dark mode background
+
+        h1 {
+            color: #fff; /* White text color for headers in dark mode */
+        }
+
+        /* Form-specific dark theme styles */
+        form {
+            .form-label {
+                color: #d1d1d1 !important; // Light text for form labels in dark mode
+            }
+            .form-select,
+            .form-control {
+                border: 1px solid #373737 !important; // Darker borders for form elements
+                color: #d7d7d7; // Light text inside form elements
+            }
+            .form-select {
+                option {
+                    background: #262626; // Dark background for dropdown options
+                }
+            }
+            .input {
+                textarea::placeholder {
+                    color: #d7d7d7; /* Lighter placeholder text color in dark mode */
+                }
+            }
+        }
+    }
 }
 
-/** Theme Styling**/
-.dark {
-    background-color: #1e1e1e;
+/* Theme toggle button styles */
+.toggle-button {
+    background-color: $toggle-background; // Dark background for the toggle button
+    width: 48px; // Width of the toggle switch
+    height: 24px; // Height of the toggle switch
+    border-radius: 50px !important; // Rounded corners for toggle switch
+    position: relative; // Allows absolute positioning of inner elements
+    padding: 5px; // Padding inside the toggle switch
+    cursor: pointer; // Change cursor to pointer for clickable elements
+    display: flex; // Flexbox for horizontal alignment
+    justify-content: space-between; // Space between icons (sun/moon)
+    align-items: center; // Align items vertically
+    border: none; // No border for the toggle button
+    outline: none; // Remove focus outline
+
+    /* Ball inside the toggle switch */
+    .ball {
+        background-color: #fff; // White color for the ball inside the switch
+        width: 20px; // Size of the ball (diameter)
+        height: 20px; // Height of the ball (diameter)
+        position: absolute; // Absolute positioning inside the toggle switch
+        left: 2px; // Initial position from the left
+        top: 2px; // Initial position from the top
+        border-radius: 50% !important; // Circular shape
+        transition: transform 0.2s linear; // Smooth transition when the ball moves
+
+        /* Move ball to the right in dark mode */
+        body.dark & {
+            transform: translateX(24px); // Shift the ball to the right in dark mode
+        }
+    }
+
+    .sun {
+        color: $sun-color; /* Yellow color for the sun icon */
+    }
+
+    .moon {
+        color: $background-light; /* White color for the moon icon */
+    }
 }
 
-.dark h1,
-body.dark .support a {
-    color: #fff;
-}
-
-.dark .form-area label {
-    color: #fff;
-}
-
-.dark .textarea-label label {
-    padding: 10px 7px;
-    display: block;
-    background: #343a40 !important;
-}
-
-.dark .output-but button.btn.btn-secondary {
-    background: #1e1e1e !important;
-    border: 1px solid #1e1e1e !important;
-}
-
-.dark .form-area select {
-    background: #1e1e1e;
-    color: #fff;
-    border-color: #484848;
-}
-
-.dark .stdin-input {
-    background: #1e1e1e;
-    color: #fff;
-    border-color: #484848;
-}
-
-.dark #stdout-output {
-    background: #1e1e1e !important;
-    color: #fff;
-    border-color: #484848;
-}
-
-.dark textarea::placeholder {
-    color: #fff;
-}
-
-.checkbox:checked + .checkbox-label .ball {
-    transform: translateX(24px);
-}
-
-/** Font-Family **/
-.poppins-thin {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 100;
-    font-style: normal;
-}
-
-.poppins-extralight {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 200;
-    font-style: normal;
-}
-
-.poppins-light {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 300;
-    font-style: normal;
-}
-
-.poppins-regular {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 400;
-    font-style: normal;
-}
-
-.poppins-medium {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 500;
-    font-style: normal;
-}
-
-.poppins-semibold {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 600;
-    font-style: normal;
-}
-
-.poppins-bold {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 700;
-    font-style: normal;
-}
-
+/* Media query for screens smaller than 992px (large desktop breakpoint) */
 @media (max-width: 992px) {
     body {
-        overflow-y: auto;
+        overflow-y: auto; // Enable vertical scrolling for smaller screens
     }
 }
