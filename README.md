@@ -67,6 +67,9 @@ environments, and deploy at scale.
     │   └── workflows
     ├── LICENSE
     ├── README.md
+    ├── architecture
+    │   ├── architecture.drawio
+    │   └── architecture.jpg
     ├── apps
     │   ├── backend
     │   ├── backend-e2e
