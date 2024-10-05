@@ -55,7 +55,7 @@ environments, and deploy at scale.
       lessons, or a **business** building custom tooling, **simple-online-programming** offers a
       highly flexible and extensible foundation.
 
-## 🏛️ Architecture
+## 🏛️ Project Architecture
 
 ![Architecture Diagram](./architecture/architecture.jpg)
 

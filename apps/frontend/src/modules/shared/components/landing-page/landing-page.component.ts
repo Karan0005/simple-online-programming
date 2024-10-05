@@ -91,6 +91,10 @@ export class LandingPageComponent {
     selectLanguage(language: { img: string; value: string; code: string }) {
         this.selectedLanguage = language;
         this.compileRequest.ProgrammingLanguage = language.value;
+        this.compileRequest.ExecutionPower = this.executionPowers[0];
+        this.compileRequest.TimeOut = this.timeouts[0].value;
+        this.compileRequest.RunTimeInput = '';
+        this.compileResult = '';
         this.dropdownOpen = false;
     }
 

@@ -153,7 +153,12 @@
                 </div>
 
                 <!-- Compile Button -->
-                <button type="submit" class="btn btn-primary w-100" (click)="compile()">
+                <button
+                    type="submit"
+                    class="btn btn-primary w-100"
+                    (click)="compile()"
+                    [disabled]="compileResult === 'Compiling...'"
+                >
                     Compile
                 </button>
             </form>
