@@ -1,12 +1,15 @@
 # Use an explicit Debian-based OpenJDK image
 FROM openjdk:18-jdk-slim
 
-# Install curl, zip, and unzip
-RUN apt-get update && apt-get install -y curl zip unzip
-
-# Install SDKMAN and Kotlin
-RUN curl -s https://get.sdkman.io | bash && \
+# Install curl, zip, unzip, SDKMAN and Kotlin
+RUN apt-get update && apt-get install -y \
+    curl \
+    unzip \
+    zip && \
+    rm -rf /var/lib/apt/lists/* && \
+    curl -s https://get.sdkman.io | bash && \
     bash -c "source /root/.sdkman/bin/sdkman-init.sh && sdk install kotlin"
+
 
 # Set environment variables to access Kotlin
 ENV PATH="/root/.sdkman/candidates/kotlin/current/bin:${PATH}"

@@ -201,11 +201,5 @@ export const CompilerResourceConfig = (execution: ExecutionPowerEnum): ICompiler
                 CPU: 8000000000 //8 CPU
             };
         }
-        default: {
-            return {
-                RAM: 268435456, //256mb RAM
-                CPU: 1000000000 //1 CPU
-            };
-        }
     }
 };

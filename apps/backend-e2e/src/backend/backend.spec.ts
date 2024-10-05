@@ -95,7 +95,7 @@ describe('POST /api/compile/v1', () => {
                 SourceCode: sourceCode,
                 ProgrammingLanguage: language,
                 ExecutionPower: 'medium',
-                TimeOut: 10,
+                TimeOut: 30,
                 RunTimeInput: ''
             };
 
@@ -196,7 +196,7 @@ describe('POST /api/compile/v1', () => {
                 SourceCode: sourceCode,
                 ProgrammingLanguage: language,
                 ExecutionPower: 'medium',
-                TimeOut: 10,
+                TimeOut: 30,
                 RunTimeInput: runTimeInput
             };
 

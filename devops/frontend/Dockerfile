@@ -14,8 +14,7 @@ ARG APP_ENV='LOCAL'
 ENV APP_ENV=${APP_ENV}
 
 # Install all dependencies and build project
-RUN npm install
-RUN npm run frontend:build
+RUN npm install && npm run frontend:build
 
 # Serve the app using nginx
 FROM nginx:alpine

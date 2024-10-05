@@ -11,7 +11,10 @@ import { RestApiService } from './shared/services';
     styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit {
-    constructor(private loggerService: NGXLogger, private restAPIService: RestApiService) {}
+    constructor(
+        private readonly loggerService: NGXLogger,
+        private readonly restAPIService: RestApiService
+    ) {}
 
     async ngOnInit(): Promise<void> {
         this.loggerService.info(

@@ -9,6 +9,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cluster from 'cluster';
 import events from 'events';
 import * as express from 'express';
+import basicAuth from 'express-basic-auth';
 import helmet from 'helmet';
 import { WinstonModule } from 'nest-winston';
 import * as os from 'os';
@@ -18,32 +19,85 @@ import { DockerService } from './docker/docker.service';
 import { AppModule } from './modules/app.module';
 
 async function bootstrap() {
-    //Setting Up Logger.
+    // Initialize a Winston logger for the application
     const appLogger = WinstonModule.createLogger({
         format: winston.format.uncolorize(),
         transports: LoggerTransports
     });
 
-    //Setting Up Environment Variables
+    // Set up environment variables (e.g., API keys or sensitive values)
     await setupSecretValues(appLogger);
+
+    // Create a new NestJS Express application
     const app = await NestFactory.create<NestExpressApplication>(AppModule, {
         bodyParser: true,
         rawBody: true
     });
+
+    // Fetch configuration values for routes and server settings
     const configService = app.get(ConfigService);
     const routePrefix = configService.get('server.routePrefix') || 'api';
+    const serverSecret: string = configService.get('server.secret') as string;
+    const apiBaseURL: string = configService.get('server.apiBaseURL') as string;
 
-    // Setting Up Application Helmet Policy Security
-    /**
-     * This header helps prevent cross-site scripting (XSS) attacks by restricting the resources that can be loaded by the application
-     * Helps prevent click jacking attacks by restricting the application from being embedded in a frame
-     * This header helps prevent attackers from learning the technology stack used by the application
-     * This header helps prevent man-in-the-middle (MITM) attacks by enforcing the use of HTTPS
-     * This header helps prevent attackers from exploiting MIME type sniffing vulnerabilities by preventing browsers from guessing the content type
-     * sets the X-XSS-Protection header to enable the browser's cross-site scripting (XSS) filter
-     * This will control the amount of information sent in the "Referer" header, which can help protect against some types of attacks.
-     *
-     */
+    // Enable CORS with allowed origins, methods, and headers
+    app.enableCors({
+        origin: configService.get('server.appBaseURL'),
+        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        preflightContinue: false,
+        optionsSuccessStatus: 204,
+        maxAge: 86400,
+        credentials: true
+    });
+
+    // Allow URL-encoded data parsing for incoming requests
+    app.use(express.urlencoded({ extended: true }));
+
+    // Apply global exception filter and response interceptor
+    app.useGlobalFilters(new ExceptionProcessor(appLogger));
+    app.useGlobalInterceptors(new ResponseProcessor());
+
+    // Use custom logger for logging across the app
+    app.useLogger(appLogger);
+
+    // Set a global route prefix (e.g., '/api')
+    app.setGlobalPrefix(routePrefix);
+
+    // Apply global validation with transformation and strict whitelisting
+    app.useGlobalPipes(
+        new ValidationPipe({
+            transform: true,
+            whitelist: true,
+            forbidNonWhitelisted: true
+        })
+    );
+
+    // Set up basic authentication for accessing Swagger documentation
+    app.use(
+        ['/' + routePrefix + '/swagger', '/' + routePrefix + '/swagger-json'],
+        basicAuth({
+            users: {
+                developer: serverSecret
+            },
+            challenge: true
+        })
+    );
+
+    // Configure Swagger documentation settings
+    const options = new DocumentBuilder()
+        .setTitle('Backend App')
+        .setDescription('API Documentation')
+        .setVersion('1.0.0')
+        .addBearerAuth()
+        .addServer(apiBaseURL)
+        .build();
+
+    // Generate the Swagger document and set up the endpoint
+    const document = SwaggerModule.createDocument(app, options);
+    SwaggerModule.setup(routePrefix + '/swagger', app, document);
+
+    // Apply Helmet for security (e.g., XSS prevention, frameguard, HSTS)
     app.use(
         helmet({
             contentSecurityPolicy: {
@@ -76,42 +130,8 @@ async function bootstrap() {
         })
     );
 
-    // Setting Up CORS Policy Security
-    app.enableCors({
-        origin: configService.get('server.appBaseURL'),
-        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization'],
-        preflightContinue: false,
-        optionsSuccessStatus: 204,
-        maxAge: 86400,
-        credentials: true
-    });
-
-    // Setting Up URL Policy Security
-    app.use(express.urlencoded({ extended: true }));
-
-    //Setting Up Middleware
-    app.useGlobalFilters(new ExceptionProcessor(appLogger));
-    app.useGlobalInterceptors(new ResponseProcessor());
-    app.useLogger(appLogger);
-    app.setGlobalPrefix(routePrefix);
-    app.useGlobalPipes(
-        new ValidationPipe({
-            transform: true,
-            whitelist: true,
-            forbidNonWhitelisted: true
-        })
-    );
-
-    //Setting Up Swagger Documentation
-    const options = new DocumentBuilder()
-        .setTitle('Backend App')
-        .setDescription('API Documentation')
-        .setVersion('1.0.0')
-        .addBearerAuth()
-        .build();
-    const document = SwaggerModule.createDocument(app, options);
-    SwaggerModule.setup(routePrefix + '/swagger', app, document);
+    // Enable graceful shutdown with NestJS built-in hooks
+    app.enableShutdownHooks();
 
     //Building up docker setup
     try {
@@ -126,59 +146,60 @@ async function bootstrap() {
         }
     }
 
-    //Initiating Server
+    // Start the server and listen on the configured port
     const port = configService.get('server.port');
     await app.listen(port);
     appLogger.log(BaseMessage.Success.ServerStartUp + port);
-    return { appLogger, configService, routePrefix };
-}
 
-function setupGracefulShutdown(worker: cluster.Worker) {
-    // Graceful shutdown on SIGINT or SIGTERM
-    process.on('SIGINT', () => {
-        console.log(`Worker ${worker.process.pid} is shutting down...`);
-        worker.kill('SIGINT');
-    });
-
-    process.on('SIGTERM', () => {
-        console.log(`Worker ${worker.process.pid} received SIGTERM, exiting...`);
-        worker.kill('SIGTERM');
-    });
-
-    worker.on('exit', (code, signal) => {
-        console.log(`Worker ${worker.process.pid} exited with code ${code} and signal ${signal}`);
-    });
+    // Return the server and related instances
+    return { appLogger, apiBaseURL, routePrefix };
 }
 
 if (cluster.default.isPrimary && process.env.APP_ENV !== EnvironmentEnum.LOCAL) {
-    // Get the number of CPUs, but allow for a configurable WORKER_COUNT
+    // Master process: create worker processes based on CPU count
     const numCPUs = os.cpus().length;
     const workerCount = process.env.WORKER_COUNT ? parseInt(process.env.WORKER_COUNT, 10) : numCPUs;
 
-    // Set a higher limit globally for all EventEmitters
+    // Set the maximum number of listeners for events
     events.EventEmitter.defaultMaxListeners = numCPUs === 1 ? 2 : numCPUs;
 
     console.log(
         `Master process is running with PID ${process.pid}. Forking ${workerCount} workers...`
     );
 
-    // Fork workers equal to WORKER_COUNT or number of CPUs
+    // Fork worker processes for each CPU core
     for (let i = 0; i < workerCount; i++) {
-        const worker = cluster.default.fork();
-        setupGracefulShutdown(worker);
+        cluster.default.fork();
     }
 
-    // If a worker dies, log the event and fork a new worker
-    cluster.default.on('exit', (worker) => {
-        console.log(`Worker ${worker.process.pid} died. Starting a new worker...`);
-        const newWorker = cluster.default.fork();
-        setupGracefulShutdown(newWorker);
+    // Restart a worker if it dies unexpectedly
+    cluster.default.on('exit', (worker, code, signal) => {
+        console.log(
+            `Worker ${worker.process.pid} exited with code ${code}, signal ${signal}. Restarting...`
+        );
+        cluster.default.fork();
+    });
+
+    // Graceful shutdown for master process
+    process.on('SIGTERM', () => {
+        console.log('Master received SIGTERM, shutting down gracefully...');
+        for (const id in cluster.default.workers) {
+            cluster.default.workers[id]?.kill();
+        }
+        process.exit(0);
+    });
+
+    process.on('SIGINT', () => {
+        console.log('Master received SIGINT, shutting down gracefully...');
+        for (const id in cluster.default.workers) {
+            cluster.default.workers[id]?.kill();
+        }
+        process.exit(0);
     });
 } else {
-    // Each worker runs its own instance of the NestJS app
+    // Worker process: start the NestJS app instance
     bootstrap()
-        .then(({ appLogger, configService, routePrefix }) => {
-            const apiBaseURL: string = configService.get('server.apiBaseURL') as string;
+        .then(({ appLogger, apiBaseURL, routePrefix }) => {
             appLogger.log(BaseMessage.Success.BackendBootstrap(apiBaseURL + '/' + routePrefix));
         })
         .catch((error) => {

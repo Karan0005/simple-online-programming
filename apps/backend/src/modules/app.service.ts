@@ -11,12 +11,12 @@ import { IRootRouteResponse } from './app.interface';
 
 @Injectable()
 export class AppService {
-    private appEnvironment: string;
+    private readonly appEnvironment: string;
 
     constructor(
-        private health: HealthCheckService,
-        private memoryHealthIndicator: MemoryHealthIndicator,
-        private diskHealthIndicator: DiskHealthIndicator,
+        private readonly health: HealthCheckService,
+        private readonly memoryHealthIndicator: MemoryHealthIndicator,
+        private readonly diskHealthIndicator: DiskHealthIndicator,
         config: ConfigService
     ) {
         this.appEnvironment = config.get('server.env') ?? '';

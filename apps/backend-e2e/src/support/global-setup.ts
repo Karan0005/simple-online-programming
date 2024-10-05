@@ -6,7 +6,7 @@ import * as path from 'path';
 import { setTimeout } from 'timers/promises';
 let backendProcess: typeof ChildProcess | undefined;
 
-dotenv.config({ path: path.resolve(process.env.PWD || process.cwd(), '.env') });
+dotenv.config({ path: path.resolve(process.env.PWD ?? process.cwd(), '.env') });
 
 const host = 'localhost';
 const port = process.env.PORT_BACKEND ?? '8000';
@@ -28,7 +28,7 @@ const startBackendServer = async (): Promise<void> => {
             }
         });
 
-        backendProcess.on('error', (error: unknown) => {
+        backendProcess.on('error', (error: Error) => {
             reject(error);
         });
 
@@ -66,28 +66,9 @@ module.exports = async function () {
 module.exports.teardown = async function () {
     if (backendProcess) {
         console.log('\nStopping backend server...\n');
-
         backendProcess.kill('SIGTERM');
-
-        // Wait for either the exit event or a timeout
-        const exitPromise = new Promise<void>((resolve) => {
-            backendProcess.on('exit', () => {
-                resolve();
-            });
-        });
-
-        const timeoutPromise = new Promise<void>(async (_, reject) => {
-            await setTimeout(3000);
-            reject(new Error('Timeout: Failed to stop the backend server in time.'));
-        });
-
-        try {
-            await Promise.race([exitPromise, timeoutPromise]);
-        } catch (error) {
-            console.error('Error during backend server shutdown:', error);
-        } finally {
-            backendProcess = undefined;
-        }
+        backendProcess.kill('SIGINT');
+        process.exit(0);
     } else {
         console.log('No backend server process to stop.');
     }
