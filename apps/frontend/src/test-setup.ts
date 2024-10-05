@@ -5,6 +5,20 @@ globalThis.ngJest = {
         errorOnUnknownProperties: true
     }
 };
+// Mock ResizeObserver for Monaco Editor
+class ResizeObserverMock {
+    observe() {
+        return;
+    }
+    unobserve() {
+        return;
+    }
+    disconnect() {
+        return;
+    }
+}
+
+global.ResizeObserver = ResizeObserverMock;
 import 'jest-preset-angular/setup-jest';
 
 Object.defineProperty(window, 'matchMedia', {
