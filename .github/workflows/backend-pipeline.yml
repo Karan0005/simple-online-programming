@@ -190,6 +190,7 @@ jobs:
                           fi
 
                           docker run -d --name redis \
+                              --network backend_network \
                               --restart always \
                               -p ${{ env.REDIS_PORT }}:${{ env.REDIS_PORT }} \
                               -v redis_data:/app/redis-data \
@@ -213,6 +214,7 @@ jobs:
                       docker run -d \
                         --restart always \
                         --name backend \
+                        --network backend_network \
                         -p ${{ env.PORT_BACKEND }}:${{ env.PORT_BACKEND }} \
                         -e APP_ENV=${{ env.APP_ENV }} \
                         -e PORT_BACKEND=${{ env.PORT_BACKEND }} \
@@ -246,6 +248,7 @@ jobs:
                           docker run -d \
                             --restart always \
                             --name backend \
+                            --network backend_network \
                             -p ${{ env.PORT_BACKEND }}:${{ env.PORT_BACKEND }} \
                             -e APP_ENV=${{ env.APP_ENV }} \
                             -e PORT_BACKEND=${{ env.PORT_BACKEND }} \
