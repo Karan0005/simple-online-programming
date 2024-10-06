@@ -51,8 +51,6 @@ export class DependencyChecker {
 
             throw new Error(`Redis ${minVersion} is not up and running.`);
         } catch (error) {
-            // eslint-disable-next-line no-console
-            console.log(error);
             throw new Error(`Redis ${minVersion} is not up and running.`);
         }
     }
