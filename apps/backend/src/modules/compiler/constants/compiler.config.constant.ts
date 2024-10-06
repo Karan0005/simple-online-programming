@@ -6,14 +6,14 @@ export const ProgrammingLanguageConfig = {
         return {
             ContainerImage: 'gcc:14.2.0',
             SourceCodeFileName: 'Main.cpp',
-            ExecutableCommand: `g++ /source-code/${uniqueId}/Main.cpp -o /source-code/${uniqueId}/Main && echo "${runTimeInputs}" | /source-code/${uniqueId}/Main`
+            ExecutableCommand: `g++ /source-code/${uniqueId}/Main.cpp -o /source-code/${uniqueId}/Main -lm && echo "${runTimeInputs}" | /source-code/${uniqueId}/Main`
         };
     },
     C: (uniqueId: string, runTimeInputs: string): IProgrammingLanguageConfig => {
         return {
             ContainerImage: 'gcc:14.2.0',
             SourceCodeFileName: 'Main.c',
-            ExecutableCommand: `gcc /source-code/${uniqueId}/Main.c -o /source-code/${uniqueId}/Main && echo "${runTimeInputs}" | /source-code/${uniqueId}/Main`
+            ExecutableCommand: `gcc /source-code/${uniqueId}/Main.c -o /source-code/${uniqueId}/Main -lm && echo "${runTimeInputs}" | /source-code/${uniqueId}/Main`
         };
     },
     Java: (
