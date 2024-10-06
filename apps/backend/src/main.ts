@@ -124,8 +124,8 @@ async function bootstrap() {
 
     // Apply Helmet for security (e.g., XSS prevention, frameguard, HSTS)
     app.use((req: Request, res: Response, next: NextFunction) => {
-        if (req.path === '/' + routePrefix + '/queues') {
-            return next(); // Skip Helmet for /queues
+        if (req.path.startsWith('/' + routePrefix + '/queues')) {
+            return next(); // Skip Helmet for routes starting with /queues
         }
 
         helmet({
