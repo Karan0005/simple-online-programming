@@ -5,7 +5,7 @@ import { Job } from 'bullmq';
 import { ICompileCodeResponse, ICompilerService } from '../../interfaces';
 import { CompileCodeValidator } from '../../validators';
 
-@Processor(InjectionType.CompilerQueueService)
+@Processor(InjectionType.CompileQueueService)
 export class CompileQueueService extends WorkerHost {
     constructor(
         @Inject(InjectionType.CompilerService) private readonly compilerService: ICompilerService

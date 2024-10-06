@@ -21,14 +21,14 @@ import { CompileQueueService, CompileService } from './services';
             inject: [ConfigService]
         }),
         BullModule.registerQueue({
-            name: InjectionType.CompilerQueueService
+            name: InjectionType.CompileQueueService
         }),
         BullBoardModule.forRoot({
             route: '/queues',
             adapter: ExpressAdapter
         }),
         BullBoardModule.forFeature({
-            name: InjectionType.CompilerQueueService,
+            name: InjectionType.CompileQueueService,
             adapter: BullMQAdapter
         })
     ],

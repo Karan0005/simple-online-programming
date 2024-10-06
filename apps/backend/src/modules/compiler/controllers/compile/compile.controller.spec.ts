@@ -1,11 +1,7 @@
 import { InjectionType } from '@full-stack-project/shared';
 import { Test, TestingModule } from '@nestjs/testing';
-import { CompileService } from '../../services/compile/compile.service';
+import { CompileQueueService, CompileService } from '../../services';
 import { CompileController } from './compile.controller';
-
-class MockCompileQueueService {
-    process = jest.fn();
-}
 
 describe('CompileController', () => {
     let controller: CompileController;
@@ -19,8 +15,8 @@ describe('CompileController', () => {
                     useClass: CompileService
                 },
                 {
-                    provide: 'BullQueue_' + InjectionType.CompilerQueueService,
-                    useClass: MockCompileQueueService
+                    provide: 'BullQueue_' + InjectionType.CompileQueueService,
+                    useClass: CompileQueueService
                 }
             ]
         }).compile();

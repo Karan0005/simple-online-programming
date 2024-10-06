@@ -1,5 +1,6 @@
 import { ControllerExceptionProcessor } from '@backend/utilities';
 import { BaseMessage, InjectionType } from '@full-stack-project/shared';
+import { InjectQueue } from '@nestjs/bullmq';
 import {
     Body,
     Controller,
@@ -10,6 +11,7 @@ import {
     Post
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Queue } from 'bullmq';
 import { ICompileCodeResponse, ICompilerController, ICompilerService } from '../../interfaces';
 import { CompileCodeResponse, CompileCodeUsingQueueResponse } from '../../swagger';
 import { CompileCodeValidator } from '../../validators';
@@ -17,7 +19,8 @@ import { CompileCodeValidator } from '../../validators';
 @Controller('compile')
 export class CompileController implements ICompilerController {
     constructor(
-        @Inject(InjectionType.CompilerService) private readonly compilerService: ICompilerService
+        @Inject(InjectionType.CompilerService) private readonly compilerService: ICompilerService,
+        @InjectQueue(InjectionType.CompileQueueService) private readonly compileQueue: Queue
     ) {}
 
     @Post('/v1')
@@ -44,11 +47,10 @@ export class CompileController implements ICompilerController {
     })
     async compileCodeUsingQueue(@Body() params: CompileCodeValidator): Promise<{ JobId: string }> {
         try {
-            const response: { JobId: string | undefined } =
-                await this.compilerService.compileCodeUsingQueue(params);
+            const job = await this.compileQueue.add(params.ProgrammingLanguage, params);
 
-            if (response.JobId) {
-                return response as { JobId: string };
+            if (job.id) {
+                return { JobId: job.id };
             }
 
             throw new InternalServerErrorException(BaseMessage.Error.SomethingWentWrong);
@@ -68,7 +70,18 @@ export class CompileController implements ICompilerController {
         @Param('jobId') jobId: string
     ): Promise<ICompileCodeResponse | undefined> {
         try {
-            return await this.compilerService.getCompileJobStatus(jobId);
+            const job = await this.compileQueue.getJob(jobId);
+            if (job) {
+                const isFailed = await job.isFailed();
+                if (isFailed) {
+                    throw new InternalServerErrorException(job.failedReason);
+                }
+
+                const isCompleted = await job.isCompleted();
+                if (isCompleted) {
+                    return job.returnvalue;
+                }
+            }
         } catch (error) {
             throw ControllerExceptionProcessor(error);
         }

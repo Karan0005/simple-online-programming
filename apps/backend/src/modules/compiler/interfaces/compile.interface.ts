@@ -8,8 +8,6 @@ export interface ICompilerController {
 
 export interface ICompilerService {
     compileCode(params: CompileCodeValidator): Promise<ICompileCodeResponse>;
-    compileCodeUsingQueue(params: CompileCodeValidator): Promise<{ JobId: string | undefined }>;
-    getCompileJobStatus(jobId: string): Promise<ICompileCodeResponse | undefined>;
 }
 
 export interface ICompileCodeResponse {
