@@ -238,6 +238,10 @@ jobs:
                               echo "Error: Failed to pull backup backend image."; exit 1;
                           }
 
+                          # Stop and remove failed container (if it exists)
+                          docker stop backend || true
+                          docker rm backend || true
+
                           docker run -d --restart always --name backend --network backend_network \
                             -p ${{ env.PORT_BACKEND }}:${{ env.PORT_BACKEND }} \
                             -e APP_ENV=${{ env.APP_ENV }} \
