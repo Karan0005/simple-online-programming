@@ -270,10 +270,12 @@ CLIENT_SECRET=
 ########################################
 ```
 
-## 🔌 Default Ports
+## 🔌 Default Ports and Routes
 
 -   Frontend: http://localhost:4000
 -   Backend: http://localhost:8000
+-   Swagger API Documentation: http://localhost:8000/api/swagger
+-   Compile Queue (BullMQ): http://localhost:8000/api/queues
 
 ## 💻 API: Flexible and Developer-Friendly
 

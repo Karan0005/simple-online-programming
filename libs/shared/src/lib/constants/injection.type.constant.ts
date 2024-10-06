@@ -1,3 +1,4 @@
 export const InjectionType = {
-    CompilerService: Symbol('CompilerService')
+    CompilerService: Symbol('CompilerService'),
+    CompilerQueueService: 'CompilerQueueService'
 };

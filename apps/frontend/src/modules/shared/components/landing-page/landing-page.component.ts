@@ -135,4 +135,40 @@ export class LandingPageComponent {
             ).Message;
         }
     }
+
+    async compileWithQueue(): Promise<void> {
+        this.compileResult = 'Compiling...';
+
+        try {
+            this.compileRequest.TimeOut = +this.compileRequest.TimeOut;
+            const response: IBaseResponse<{ JobId: string }> = await this.apiService.post<
+                ICompileRequest,
+                IBaseResponse<{ JobId: string }>
+            >(ApiRoute.Compiler.V1.CompileWithQueue, this.compileRequest);
+
+            if (response.Data.JobId) {
+                while (this.compileResult === 'Compiling...') {
+                    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+                    const jobResponse: IBaseResponse<ICompileResponse> = await this.apiService.get<
+                        IBaseResponse<ICompileResponse>
+                    >(ApiRoute.Compiler.V1.GetCompileJobStatus + '/' + response.Data.JobId);
+
+                    if (jobResponse.Data.CompilationStatus) {
+                        this.compileResult =
+                            (jobResponse.Data.ExecutionDetails.Output ??
+                                jobResponse.Data.ExecutionDetails.Errors ??
+                                jobResponse.Message) ||
+                            BaseMessage.Error.SomethingWentWrong;
+                    }
+                }
+            } else {
+                this.compileResult = response.Message || BaseMessage.Error.SomethingWentWrong;
+            }
+        } catch (error) {
+            this.compileResult = (
+                (error as HttpErrorResponse).error as IBaseResponse<null>
+            ).Message;
+        }
+    }
 }

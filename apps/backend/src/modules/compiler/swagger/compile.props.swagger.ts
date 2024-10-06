@@ -17,3 +17,16 @@ export class CompileCodeResponse<T> extends APISuccessResponse<T> implements IBa
     })
     declare Data: T;
 }
+
+export class CompileCodeUsingQueueResponse<T>
+    extends APISuccessResponse<T>
+    implements IBaseResponse<T>
+{
+    @ApiProperty({
+        example: {
+            JobId: '87539033'
+        },
+        description: BaseMessage.SwaggerMessage.Property.Description.Data
+    })
+    declare Data: T;
+}

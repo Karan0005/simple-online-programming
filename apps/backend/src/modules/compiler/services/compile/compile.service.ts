@@ -3,10 +3,13 @@ import {
     BaseMessage,
     DateProcessor,
     DateTimeTypeEnum,
+    InjectionType,
     ProgrammingLanguageEnum,
     RandomValueTypeEnum
 } from '@full-stack-project/shared';
+import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable } from '@nestjs/common';
+import { Queue } from 'bullmq';
 import Docker, { MountSettings, MountType } from 'dockerode';
 import fs from 'fs';
 import * as path from 'path';
@@ -25,6 +28,10 @@ const rootPath: string = path.resolve(process.env.PWD ?? process.cwd(), 'source-
 @Injectable()
 export class CompileService implements ICompilerService {
     private readonly dockerClient = new Docker();
+
+    constructor(
+        @InjectQueue(InjectionType.CompilerQueueService) private readonly compileQueue: Queue
+    ) {}
 
     async compileCode(params: CompileCodeValidator): Promise<ICompileCodeResponse> {
         const uniqueId: string = RandomValueFactory(RandomValueTypeEnum.UUID) as string;
@@ -131,6 +138,23 @@ export class CompileService implements ICompilerService {
             }
             if (fs.existsSync(`${rootPath}/${uniqueId}`)) {
                 await fs.promises.rm(`${rootPath}/${uniqueId}`, { recursive: true, force: true });
+            }
+        }
+    }
+
+    async compileCodeUsingQueue(
+        params: CompileCodeValidator
+    ): Promise<{ JobId: string | undefined }> {
+        const job = await this.compileQueue.add(params.ProgrammingLanguage, params);
+        return { JobId: job.id };
+    }
+
+    async getCompileJobStatus(jobId: string): Promise<ICompileCodeResponse | undefined> {
+        const job = await this.compileQueue.getJob(jobId);
+        if (job) {
+            const isCompleted = await job.isCompleted();
+            if (isCompleted) {
+                return job.returnvalue;
             }
         }
     }

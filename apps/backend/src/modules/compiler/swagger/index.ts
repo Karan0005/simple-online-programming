@@ -1,3 +1,3 @@
-import { CompileCodeResponse } from './compile.props.swagger';
+import { CompileCodeResponse, CompileCodeUsingQueueResponse } from './compile.props.swagger';
 
-export { CompileCodeResponse };
+export { CompileCodeResponse, CompileCodeUsingQueueResponse };

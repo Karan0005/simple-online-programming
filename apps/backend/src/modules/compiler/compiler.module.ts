@@ -1,9 +1,13 @@
+import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
+import { ExpressAdapter } from '@bull-board/express';
+import { BullBoardModule } from '@bull-board/nestjs';
 import { InjectionType } from '@full-stack-project/shared';
 import { BullModule } from '@nestjs/bullmq';
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import basicAuth from 'express-basic-auth';
 import { CompileController } from './controllers';
-import { CompileService } from './services';
+import { CompileQueueService, CompileService } from './services';
 
 @Module({
     imports: [
@@ -17,7 +21,15 @@ import { CompileService } from './services';
             inject: [ConfigService]
         }),
         BullModule.registerQueue({
-            name: 'compile'
+            name: InjectionType.CompilerQueueService
+        }),
+        BullBoardModule.forRoot({
+            route: '/queues',
+            adapter: ExpressAdapter
+        }),
+        BullBoardModule.forFeature({
+            name: InjectionType.CompilerQueueService,
+            adapter: BullMQAdapter
         })
     ],
     controllers: [CompileController],
@@ -25,7 +37,24 @@ import { CompileService } from './services';
         {
             provide: InjectionType.CompilerService,
             useClass: CompileService
-        }
+        },
+        CompileQueueService
     ]
 })
-export class CompilerModule {}
+export class CompilerModule {
+    constructor(private readonly configService: ConfigService) {}
+
+    configure(consumer: MiddlewareConsumer) {
+        const serverSecret: string = this.configService.get('server.secret') as string;
+
+        consumer
+            .apply(
+                basicAuth({
+                    users: { developer: serverSecret },
+                    challenge: true,
+                    realm: 'Bull Board'
+                })
+            )
+            .forRoutes('/queues');
+    }
+}

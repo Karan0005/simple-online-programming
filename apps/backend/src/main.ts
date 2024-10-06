@@ -93,7 +93,8 @@ async function bootstrap() {
             users: {
                 developer: serverSecret
             },
-            challenge: true
+            challenge: true,
+            realm: 'Swagger API Documentation'
         })
     );
 
