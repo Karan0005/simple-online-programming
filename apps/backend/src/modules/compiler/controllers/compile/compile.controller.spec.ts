@@ -3,6 +3,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CompileService } from '../../services/compile/compile.service';
 import { CompileController } from './compile.controller';
 
+class MockCompileQueueService {
+    process = jest.fn();
+}
+
 describe('CompileController', () => {
     let controller: CompileController;
 
@@ -13,6 +17,10 @@ describe('CompileController', () => {
                 {
                     provide: InjectionType.CompilerService,
                     useClass: CompileService
+                },
+                {
+                    provide: 'BullQueue_' + InjectionType.CompilerQueueService,
+                    useClass: MockCompileQueueService
                 }
             ]
         }).compile();
