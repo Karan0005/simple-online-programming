@@ -180,6 +180,9 @@ jobs:
                       if [ ! "$(docker ps -q -f name=redis)" ]; then
                           echo "Creating volume and container for redis..."
 
+                          # Ensure network exists
+                          docker network inspect backend_network >/dev/null 2>&1 || docker network create backend_network
+
                           VOLUME_NAME="redis_data"
                           echo "Creating volume '${VOLUME_NAME}'..."
                           if docker volume create "${VOLUME_NAME}"; then
