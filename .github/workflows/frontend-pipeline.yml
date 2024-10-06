@@ -134,37 +134,49 @@ jobs:
                           echo "Docker is already installed."
                       fi
 
-                      # Pull the latest image
-                      docker pull ${{ secrets.DOCKER_USERNAME }}/frontend:${{ env.DOCKER_TAG }}
+                      # Function to deploy frontend container
+                      deploy_frontend() {
+                          # Pull the latest image
+                          echo "Pulling latest frontend image..."
+                          docker pull ${{ secrets.DOCKER_USERNAME }}/frontend:${{ env.DOCKER_TAG }} || {
+                              echo "Error: Failed to pull frontend image."; exit 1;
+                          }
 
-                      # Check if the container is running
-                      if [ "$(docker ps -q -f name=frontend)" ]; then
-                          # Stop and remove the old container if it exists
-                          docker stop frontend
-                          docker rm frontend
-                      fi
+                          # Check if the container is running
+                          if [ "$(docker ps -q -f name=frontend)" ]; then
+                              # Stop and remove the old container if it exists
+                              echo "Stopping and removing old frontend container..."
+                              docker stop frontend && docker rm frontend || {
+                                  echo "Error: Failed to stop/remove frontend container."; exit 1;
+                              }
+                          fi
 
-                      # Run the new container
-                      docker run -d \
-                        --restart always \
-                        --name frontend \
-                        -p ${{ env.PORT_FRONTEND }}:${{ env.PORT_FRONTEND }} \
-                        -e APP_ENV=${{ env.APP_ENV }} \
-                        -e PORT_FRONTEND=${{ env.PORT_FRONTEND }} \
-                        ${{ secrets.DOCKER_USERNAME }}/frontend:${{ env.DOCKER_TAG }}
+                          # Run the new container
+                          echo "Starting new frontend container..."
+                          docker run -d \
+                            --restart always \
+                            --name frontend \
+                            -p ${{ env.PORT_FRONTEND }}:${{ env.PORT_FRONTEND }} \
+                            -e APP_ENV=${{ env.APP_ENV }} \
+                            -e PORT_FRONTEND=${{ env.PORT_FRONTEND }} \
+                            ${{ secrets.DOCKER_USERNAME }}/frontend:${{ env.DOCKER_TAG }} || {
+                              echo "Error: Failed to start new frontend container."; exit 1;
+                          }
+                      }
 
-                      # Check if the new container started successfully
-                      if [ "$(docker ps -q -f name=frontend)" ]; then
-                          echo "Frontend container started successfully."
-                      else
-                          echo "New frontend container failed to start. Rolling back to backup..."
+                      # Function to roll back to backup frontend container
+                      rollback_frontend() {
+                          echo "Rolling back to previous frontend container..."
 
                           # Stop and remove failed container (if it exists)
                           docker stop frontend || true
                           docker rm frontend || true
 
-                          # Pull the latest image
-                          docker pull ${{ secrets.DOCKER_USERNAME }}/frontend:${{ env.DOCKER_TAG }}_backup
+                          # Pull the backup image
+                          echo "Pulling backup frontend image..."
+                          docker pull ${{ secrets.DOCKER_USERNAME }}/frontend:${{ env.DOCKER_TAG }}_backup || {
+                              echo "Error: Failed to pull backup frontend image."; exit 1;
+                          }
 
                           # Start the previous backed-up container
                           docker run -d \
@@ -173,10 +185,15 @@ jobs:
                             -p ${{ env.PORT_FRONTEND }}:${{ env.PORT_FRONTEND }} \
                             -e APP_ENV=${{ env.APP_ENV }} \
                             -e PORT_FRONTEND=${{ env.PORT_FRONTEND }} \
-                            ${{ secrets.DOCKER_USERNAME }}/frontend:${{ env.DOCKER_TAG }}_backup
+                            ${{ secrets.DOCKER_USERNAME }}/frontend:${{ env.DOCKER_TAG }}_backup || {
+                              echo "Error: Failed to start backup frontend container."; exit 1;
+                          }
 
                           echo "Rolled back to the previous frontend container."
-                      fi
+                      }
+
+                      # Deploy frontend container and rollback if it fails
+                      deploy_frontend || rollback_frontend
 
                       # Remove old frontend images (dangling images)
                       docker images --filter "dangling=true" --format "{{.ID}}" | xargs -r docker rmi || true
