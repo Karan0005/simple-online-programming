@@ -9,6 +9,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cluster from 'cluster';
 import events from 'events';
 import * as express from 'express';
+import { NextFunction, Request, Response } from 'express';
 import basicAuth from 'express-basic-auth';
 import helmet from 'helmet';
 import { WinstonModule } from 'nest-winston';
@@ -111,8 +112,22 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, options);
     SwaggerModule.setup(routePrefix + '/swagger', app, document);
 
-    // Apply Helmet for security (e.g., XSS prevention, frameguard, HSTS)
+    // Set up basic authentication for accessing compiler queues
     app.use(
+        ['/' + routePrefix + '/queues'],
+        basicAuth({
+            users: { developer: serverSecret },
+            challenge: true,
+            realm: 'Bull Board'
+        })
+    );
+
+    // Apply Helmet for security (e.g., XSS prevention, frameguard, HSTS)
+    app.use((req: Request, res: Response, next: NextFunction) => {
+        if (req.path === '/' + routePrefix + '/queues') {
+            return next(); // Skip Helmet for /queues
+        }
+
         helmet({
             contentSecurityPolicy: {
                 useDefaults: true,
@@ -141,8 +156,8 @@ async function bootstrap() {
             referrerPolicy: { policy: 'same-origin' },
             crossOriginEmbedderPolicy: true,
             crossOriginOpenerPolicy: { policy: 'same-origin' }
-        })
-    );
+        })(req, res, next); // Apply Helmet middleware
+    });
 
     // Enable graceful shutdown with NestJS built-in hooks
     app.enableShutdownHooks();

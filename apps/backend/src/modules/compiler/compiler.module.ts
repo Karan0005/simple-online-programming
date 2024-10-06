@@ -3,9 +3,8 @@ import { ExpressAdapter } from '@bull-board/express';
 import { BullBoardModule } from '@bull-board/nestjs';
 import { InjectionType } from '@full-stack-project/shared';
 import { BullModule } from '@nestjs/bullmq';
-import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import basicAuth from 'express-basic-auth';
 import { CompileController } from './controllers';
 import { CompileQueueService, CompileService } from './services';
 
@@ -41,20 +40,4 @@ import { CompileQueueService, CompileService } from './services';
         CompileQueueService
     ]
 })
-export class CompilerModule {
-    constructor(private readonly configService: ConfigService) {}
-
-    configure(consumer: MiddlewareConsumer) {
-        const serverSecret: string = this.configService.get('server.secret') as string;
-
-        consumer
-            .apply(
-                basicAuth({
-                    users: { developer: serverSecret },
-                    challenge: true,
-                    realm: 'Bull Board'
-                })
-            )
-            .forRoutes('/queues');
-    }
-}
+export class CompilerModule {}
