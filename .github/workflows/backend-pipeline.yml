@@ -78,6 +78,9 @@ jobs:
                   case $GITHUB_REF in
                     refs/heads/develop)
                       echo "APP_ENV=DEV" >> $GITHUB_ENV
+                      echo "REDIS_HOST=redis" >> $GITHUB_ENV
+                      echo "REDIS_PORT=6379" >> $GITHUB_ENV
+                      echo "MIN_REDIS_VERSION=7.0.0" >> $GITHUB_ENV
                       echo "PORT_BACKEND=8000" >> $GITHUB_ENV
                       echo "PORT_FRONTEND=80" >> $GITHUB_ENV
                       echo "DOCKER_TAG=develop" >> $GITHUB_ENV
@@ -95,6 +98,9 @@ jobs:
                       ;;
                     refs/heads/uat)
                       echo "APP_ENV=UAT" >> $GITHUB_ENV
+                      echo "REDIS_HOST=redis" >> $GITHUB_ENV
+                      echo "REDIS_PORT=6379" >> $GITHUB_ENV
+                      echo "MIN_REDIS_VERSION=7.0.0" >> $GITHUB_ENV
                       echo "PORT_BACKEND=8000" >> $GITHUB_ENV
                       echo "PORT_FRONTEND=80" >> $GITHUB_ENV
                       echo "DOCKER_TAG=uat" >> $GITHUB_ENV
@@ -112,6 +118,9 @@ jobs:
                       ;;
                     refs/heads/main)
                       echo "APP_ENV=PROD" >> $GITHUB_ENV
+                      echo "REDIS_HOST=redis" >> $GITHUB_ENV
+                      echo "REDIS_PORT=6379" >> $GITHUB_ENV
+                      echo "MIN_REDIS_VERSION=7.0.0" >> $GITHUB_ENV
                       echo "PORT_BACKEND=8000" >> $GITHUB_ENV
                       echo "PORT_FRONTEND=80" >> $GITHUB_ENV
                       echo "DOCKER_TAG=prod" >> $GITHUB_ENV
@@ -167,6 +176,29 @@ jobs:
                       # Create volume if not exists
                       create_volume_if_not_exists
 
+                      # Check if Redis container exists
+                      if [ ! "$(docker ps -q -f name=redis)" ]; then
+                          echo "Creating volume and container for redis..."
+
+                          VOLUME_NAME="redis_data"
+                          echo "Creating volume '${VOLUME_NAME}'..."
+                          if docker volume create "${VOLUME_NAME}"; then
+                              echo "Volume '${VOLUME_NAME}' created successfully."
+                          else
+                              echo "Error: Failed to create volume '${VOLUME_NAME}'."
+                              exit 1  # Exit with an error code
+                          fi
+
+                          docker run -d --name redis \
+                              --restart always \
+                              -p ${{ env.REDIS_PORT }}:${{ env.REDIS_PORT }} \
+                              -v redis_data:/app/redis-data \
+                              redis:7
+                          echo "Redis container started."
+                      else
+                          echo "Redis container already exists. Skipping creation."
+                      fi
+
                       # Pull the latest image
                       docker pull ${{ secrets.DOCKER_USERNAME }}/backend:${{ env.DOCKER_TAG }}
 
@@ -190,6 +222,9 @@ jobs:
                         -e TENANT_ID=${{ env.TENANT_ID }} \
                         -e CLIENT_ID=${{ env.CLIENT_ID }} \
                         -e CLIENT_SECRET=${{ env.CLIENT_SECRET }} \
+                        -e REDIS_HOST=${{ env.REDIS_HOST }} \
+                        -e REDIS_PORT=${{ env.REDIS_PORT }} \
+                        -e MIN_REDIS_VERSION=${{ env.MIN_REDIS_VERSION }} \
                         -v /var/run/docker.sock:/var/run/docker.sock \
                         -v source_code_volume:/app/source-code \
                         ${{ secrets.DOCKER_USERNAME }}/backend:${{ env.DOCKER_TAG }}
@@ -220,6 +255,9 @@ jobs:
                             -e TENANT_ID=${{ env.TENANT_ID }} \
                             -e CLIENT_ID=${{ env.CLIENT_ID }} \
                             -e CLIENT_SECRET=${{ env.CLIENT_SECRET }} \
+                            -e REDIS_HOST=${{ env.REDIS_HOST }} \
+                            -e REDIS_PORT=${{ env.REDIS_PORT }} \
+                            -e MIN_REDIS_VERSION=${{ env.MIN_REDIS_VERSION }} \
                             -v /var/run/docker.sock:/var/run/docker.sock \
                             -v source_code_volume:/app/source-code \
                             ${{ secrets.DOCKER_USERNAME }}/backend:${{ env.DOCKER_TAG }}_backup

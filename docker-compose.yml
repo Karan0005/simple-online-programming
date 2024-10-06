@@ -14,6 +14,9 @@ services:
             - TENANT_ID=${TENANT_ID}
             - CLIENT_ID=${CLIENT_ID}
             - CLIENT_SECRET=${CLIENT_SECRET}
+            - REDIS_HOST=redis
+            - REDIS_PORT=${REDIS_PORT}
+            - MIN_REDIS_VERSION=${MIN_REDIS_VERSION}
         image: backend_image
         container_name: backend_container
         ports:
@@ -22,6 +25,8 @@ services:
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
             - source_code_volume:/app/source-code
+        depends_on:
+            - redis
     frontend:
         build:
             context: .
@@ -39,7 +44,18 @@ services:
             - '${PORT_FRONTEND}:${PORT_FRONTEND}'
         depends_on:
             - backend
+    redis:
+        image: redis:7
+        environment:
+            - REDIS_PORT=${REDIS_PORT}
+        container_name: redis_container
+        ports:
+            - '${REDIS_PORT}:${REDIS_PORT}'
+        volumes:
+            - redis_data:/app/redis-data
 
 volumes:
     source_code_volume:
         name: source_code_volume
+    redis_data:
+        name: redis_data

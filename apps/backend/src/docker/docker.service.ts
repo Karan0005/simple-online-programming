@@ -12,17 +12,6 @@ export class DockerService {
         this.logger = logger;
     }
 
-    async checkDockerInstalled(): Promise<boolean> {
-        try {
-            await execAsync('docker --version');
-            this.logger.log('Docker found, now pulling images.');
-            return true;
-        } catch (error) {
-            this.logger.error('Docker is not installed:', error);
-            return false;
-        }
-    }
-
     async pullDockerImages(): Promise<void> {
         const images = [
             'gcc:14.2.0',
@@ -76,13 +65,7 @@ export class DockerService {
     }
 
     async setupDockerImages(): Promise<void> {
-        const isDockerInstalled = await this.checkDockerInstalled();
-
-        if (isDockerInstalled) {
-            await this.pullDockerImages();
-            await this.buildCustomImages();
-        } else {
-            throw new Error('Docker is not installed on this machine.');
-        }
+        await this.pullDockerImages();
+        await this.buildCustomImages();
     }
 }

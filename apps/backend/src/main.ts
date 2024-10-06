@@ -14,7 +14,7 @@ import helmet from 'helmet';
 import { WinstonModule } from 'nest-winston';
 import * as os from 'os';
 import * as winston from 'winston';
-import { LoggerTransports, setupSecretValues } from './config';
+import { DependencyChecker, LoggerTransports, setupSecretValues } from './config';
 import { DockerService } from './docker/docker.service';
 import { AppModule } from './modules/app.module';
 
@@ -39,6 +39,19 @@ async function bootstrap() {
     const routePrefix = configService.get('server.routePrefix') || 'api';
     const serverSecret: string = configService.get('server.secret') as string;
     const apiBaseURL: string = configService.get('server.apiBaseURL') as string;
+
+    // Validate required dependencies
+    try {
+        const dependencyChecker = new DependencyChecker(appLogger, configService);
+        await dependencyChecker.verify();
+    } catch (error) {
+        if (error instanceof Error) {
+            appLogger.log(`Error: ${error.message}`);
+        } else {
+            appLogger.log(`Error: ${String(error)}`);
+        }
+        process.exit(1);
+    }
 
     // Enable CORS with allowed origins, methods, and headers
     app.enableCors({
@@ -144,6 +157,7 @@ async function bootstrap() {
         } else {
             appLogger.log(`Error setting up Docker images: ${String(error)}`);
         }
+        process.exit(1);
     }
 
     // Start the server and listen on the configured port
