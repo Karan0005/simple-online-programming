@@ -146,11 +146,9 @@ jobs:
                   key: ${{ env.SERVER_PRIVATE_SSH_KEY }}
                   passphrase: ${{ env.SERVER_PASS_PHRASE }}
                   script: |
-                      # Check if Docker is installed
+                      # Ensure Docker is installed
                       if ! command -v docker &> /dev/null; then
                           echo "Docker not found, installing..."
-
-                          # Install Docker
                           curl -fsSL https://get.docker.com -o get-docker.sh
                           sh get-docker.sh
                       else
@@ -159,99 +157,59 @@ jobs:
 
                       # Function to create Docker volume if it does not exist
                       create_volume_if_not_exists() {
-                          VOLUME_NAME="source_code_volume"
+                          local VOLUME_NAME=$1
                           if [[ $(docker volume ls -q -f name=^${VOLUME_NAME}$) ]]; then
                               echo "Volume '${VOLUME_NAME}' already exists. Skipping creation."
                           else
                               echo "Creating volume '${VOLUME_NAME}'..."
-                              if docker volume create "${VOLUME_NAME}"; then
-                                  echo "Volume '${VOLUME_NAME}' created successfully."
-                              else
-                                  echo "Error: Failed to create volume '${VOLUME_NAME}'."
-                                  exit 1  # Exit with an error code
-                              fi
+                              docker volume create "${VOLUME_NAME}" || {
+                                  echo "Error: Failed to create volume '${VOLUME_NAME}'."; exit 1;
+                              }
                           fi
                       }
 
-                      # Create volume if not exists
-                      create_volume_if_not_exists
+                      # Function to create Docker network if it does not exist
+                      create_network_if_not_exists() {
+                          local NETWORK_NAME=$1
+                          docker network inspect ${NETWORK_NAME} >/dev/null 2>&1 || {
+                              echo "Creating Docker network '${NETWORK_NAME}'..."
+                              docker network create ${NETWORK_NAME} || {
+                                  echo "Error: Failed to create network '${NETWORK_NAME}'."; exit 1;
+                              }
+                          }
+                      }
 
-                      # Check if Redis container exists
-                      if [ ! "$(docker ps -q -f name=redis)" ]; then
-                          echo "Creating volume and container for redis..."
-
-                          # Ensure network exists
-                          docker network inspect backend_network >/dev/null 2>&1 || docker network create backend_network
-
-                          VOLUME_NAME="redis_data"
-                          echo "Creating volume '${VOLUME_NAME}'..."
-                          if docker volume create "${VOLUME_NAME}"; then
-                              echo "Volume '${VOLUME_NAME}' created successfully."
+                      # Function to set up Redis container if not running
+                      setup_redis() {
+                          if [ ! "$(docker ps -q -f name=redis)" ]; then
+                              echo "Setting up Redis container..."
+                              docker run -d --name redis --network backend_network --restart always \
+                                -p ${{ env.REDIS_PORT }}:${{ env.REDIS_PORT }} \
+                                -v redis_data:/app/redis-data redis:7 || {
+                                  echo "Error: Failed to start Redis container."; exit 1;
+                              }
+                              echo "Redis container started."
                           else
-                              echo "Error: Failed to create volume '${VOLUME_NAME}'."
-                              exit 1  # Exit with an error code
+                              echo "Redis container already running."
+                          fi
+                      }
+
+                      # Function to deploy backend container
+                      deploy_backend() {
+                          echo "Pulling latest backend image..."
+                          docker pull ${{ secrets.DOCKER_USERNAME }}/backend:${{ env.DOCKER_TAG }} || {
+                              echo "Error: Failed to pull backend image."; exit 1;
+                          }
+
+                          if [ "$(docker ps -q -f name=backend)" ]; then
+                              echo "Stopping and removing old backend container..."
+                              docker stop backend && docker rm backend || {
+                                  echo "Error: Failed to stop/remove backend container."; exit 1;
+                              }
                           fi
 
-                          docker run -d --name redis \
-                              --network backend_network \
-                              --restart always \
-                              -p ${{ env.REDIS_PORT }}:${{ env.REDIS_PORT }} \
-                              -v redis_data:/app/redis-data \
-                              redis:7
-                          echo "Redis container started."
-                      else
-                          echo "Redis container already exists. Skipping creation."
-                      fi
-
-                      # Pull the latest image
-                      docker pull ${{ secrets.DOCKER_USERNAME }}/backend:${{ env.DOCKER_TAG }}
-
-                      # Check if the container is running
-                      if [ "$(docker ps -q -f name=backend)" ]; then
-                          # Stop and remove the old container if it exists
-                          docker stop backend
-                          docker rm backend
-                      fi
-
-                      # Run the new container
-                      docker run -d \
-                        --restart always \
-                        --name backend \
-                        --network backend_network \
-                        -p ${{ env.PORT_BACKEND }}:${{ env.PORT_BACKEND }} \
-                        -e APP_ENV=${{ env.APP_ENV }} \
-                        -e PORT_BACKEND=${{ env.PORT_BACKEND }} \
-                        -e PORT_FRONTEND=${{ env.PORT_FRONTEND }} \
-                        -e ROUTE_PREFIX=${{ env.ROUTE_PREFIX }} \
-                        -e KEY_VAULT_URI=${{ env.KEY_VAULT_URI }} \
-                        -e TENANT_ID=${{ env.TENANT_ID }} \
-                        -e CLIENT_ID=${{ env.CLIENT_ID }} \
-                        -e CLIENT_SECRET=${{ env.CLIENT_SECRET }} \
-                        -e REDIS_HOST=${{ env.REDIS_HOST }} \
-                        -e REDIS_PORT=${{ env.REDIS_PORT }} \
-                        -e MIN_REDIS_VERSION=${{ env.MIN_REDIS_VERSION }} \
-                        -v /var/run/docker.sock:/var/run/docker.sock \
-                        -v source_code_volume:/app/source-code \
-                        ${{ secrets.DOCKER_USERNAME }}/backend:${{ env.DOCKER_TAG }}
-
-                      # Check if the new container started successfully
-                      if [ "$(docker ps -q -f name=backend)" ]; then
-                          echo "Backend container started successfully."
-                      else
-                          echo "New backend container failed to start. Rolling back to backup..."
-
-                          # Stop and remove failed container (if it exists)
-                          docker stop backend || true
-                          docker rm backend || true
-
-                          # Pull the latest image
-                          docker pull ${{ secrets.DOCKER_USERNAME }}/backend:${{ env.DOCKER_TAG }}_backup
-
-                          # Start the previous backed-up container
-                          docker run -d \
-                            --restart always \
-                            --name backend \
-                            --network backend_network \
+                          echo "Starting new backend container..."
+                          docker run -d --restart always --name backend --network backend_network \
                             -p ${{ env.PORT_BACKEND }}:${{ env.PORT_BACKEND }} \
                             -e APP_ENV=${{ env.APP_ENV }} \
                             -e PORT_BACKEND=${{ env.PORT_BACKEND }} \
@@ -266,10 +224,54 @@ jobs:
                             -e MIN_REDIS_VERSION=${{ env.MIN_REDIS_VERSION }} \
                             -v /var/run/docker.sock:/var/run/docker.sock \
                             -v source_code_volume:/app/source-code \
-                            ${{ secrets.DOCKER_USERNAME }}/backend:${{ env.DOCKER_TAG }}_backup
+                            ${{ secrets.DOCKER_USERNAME }}/backend:${{ env.DOCKER_TAG }} || {
+                              echo "Error: Failed to start new backend container."; exit 1;
+                          }
 
-                          echo "Rolled back to the previous backend container."
-                      fi
+                          echo "Backend container started successfully."
+                      }
+
+                      # Function to roll back to backup backend container
+                      rollback_backend() {
+                          echo "Rolling back to backup backend container..."
+                          docker pull ${{ secrets.DOCKER_USERNAME }}/backend:${{ env.DOCKER_TAG }}_backup || {
+                              echo "Error: Failed to pull backup backend image."; exit 1;
+                          }
+
+                          docker run -d --restart always --name backend --network backend_network \
+                            -p ${{ env.PORT_BACKEND }}:${{ env.PORT_BACKEND }} \
+                            -e APP_ENV=${{ env.APP_ENV }} \
+                            -e PORT_BACKEND=${{ env.PORT_BACKEND }} \
+                            -e PORT_FRONTEND=${{ env.PORT_FRONTEND }} \
+                            -e ROUTE_PREFIX=${{ env.ROUTE_PREFIX }} \
+                            -e KEY_VAULT_URI=${{ env.KEY_VAULT_URI }} \
+                            -e TENANT_ID=${{ env.TENANT_ID }} \
+                            -e CLIENT_ID=${{ env.CLIENT_ID }} \
+                            -e CLIENT_SECRET=${{ env.CLIENT_SECRET }} \
+                            -e REDIS_HOST=${{ env.REDIS_HOST }} \
+                            -e REDIS_PORT=${{ env.REDIS_PORT }} \
+                            -e MIN_REDIS_VERSION=${{ env.MIN_REDIS_VERSION }} \
+                            -v /var/run/docker.sock:/var/run/docker.sock \
+                            -v source_code_volume:/app/source-code \
+                            ${{ secrets.DOCKER_USERNAME }}/backend:${{ env.DOCKER_TAG }}_backup || {
+                              echo "Error: Failed to roll back to backup backend container."; exit 1;
+                          }
+
+                          echo "Rolled back to backup backend container."
+                      }
+
+                      # Create necessary volumes
+                      create_volume_if_not_exists "source_code_volume"
+                      create_volume_if_not_exists "redis_data"
+
+                      # Create necessary network
+                      create_network_if_not_exists "backend_network"
+
+                      # Set up Redis container
+                      setup_redis
+
+                      # Deploy backend container
+                      deploy_backend || rollback_backend
 
                       # Remove old backend images (dangling images)
                       docker images --filter "dangling=true" --format "{{.ID}}" | xargs -r docker rmi || true
