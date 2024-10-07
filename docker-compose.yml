@@ -49,8 +49,6 @@ services:
         environment:
             - REDIS_PORT=${REDIS_PORT}
         container_name: redis_container
-        ports:
-            - '${REDIS_PORT}:${REDIS_PORT}'
         volumes:
             - redis_data:/app/redis-data
 

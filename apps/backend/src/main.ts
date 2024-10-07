@@ -20,7 +20,7 @@ import { DockerService } from './docker/docker.service';
 import { AppModule } from './modules/app.module';
 
 async function bootstrap() {
-    // Initialize a Winston logger for the application logs
+    // Initialize a Winston logger for the application
     const appLogger = WinstonModule.createLogger({
         format: winston.format.uncolorize(),
         transports: LoggerTransports

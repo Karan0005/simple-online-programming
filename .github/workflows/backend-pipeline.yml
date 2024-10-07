@@ -184,7 +184,6 @@ jobs:
                           if [ ! "$(docker ps -q -f name=redis)" ]; then
                               echo "Setting up Redis container..."
                               docker run -d --name redis --network backend_network --restart always \
-                                -p ${{ env.REDIS_PORT }}:${{ env.REDIS_PORT }} \
                                 -v redis_data:/app/redis-data redis:7 || {
                                   echo "Error: Failed to start Redis container."; exit 1;
                               }
