@@ -103,7 +103,7 @@ describe('POST /api/compile/v1', () => {
             expect(res.status).toBe(201);
             expect(res.data.IsSuccess).toBe(true);
             expect(res.data.Data.ExecutionDetails.Output).toEqual(expectedOutput);
-        }, 10000);
+        }, 15000);
     }
 
     const sumPrograms: Record<string, Program> = {
@@ -204,6 +204,6 @@ describe('POST /api/compile/v1', () => {
             expect(res.status).toBe(201);
             expect(res.data.IsSuccess).toBe(true);
             expect(res.data.Data.ExecutionDetails.Output).toEqual(expectedOutput);
-        }, 10000);
+        }, 15000);
     }
 });

@@ -265,6 +265,10 @@ TENANT_ID=
 CLIENT_ID=
 CLIENT_SECRET=
 
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+MIN_REDIS_VERSION='7.0.0'
+
 ########################################
 #### Frontend Environment Variables ####
 ########################################
