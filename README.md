@@ -104,7 +104,7 @@ Ensure that you have the following installed:
 
 -   [Node.js (>= 20.17.0)](https://nodejs.org/en/download/package-manager)
 -   [Docker Desktop](https://www.docker.com/products/docker-desktop)
--   [Redis](https://redis.io/)
+-   [Redis (>= 7.0.0)](https://redis.io/)
 -   [Visual Studio Code (Recommended)](https://code.visualstudio.com/Download)
 
 ### Setup Instructions
