@@ -1,8 +1,5 @@
-import { CommonModule } from '@angular/common';
-import { provideHttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
-import { RestApiService } from '../../services';
+import { SharedModule } from '../../shared.module';
 import { MonacoEditorComponent } from '../monaco-editor/monaco-editor.component';
 import { LandingPageComponent } from './landing-page.component';
 
@@ -12,9 +9,8 @@ describe('LandingPageComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [CommonModule, FormsModule],
-            declarations: [LandingPageComponent, MonacoEditorComponent],
-            providers: [provideHttpClient(), RestApiService]
+            imports: [SharedModule],
+            declarations: [LandingPageComponent, MonacoEditorComponent]
         }).compileComponents();
 
         fixture = TestBed.createComponent(LandingPageComponent);
