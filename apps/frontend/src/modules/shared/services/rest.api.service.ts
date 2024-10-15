@@ -82,19 +82,17 @@ export class RestApiService {
         );
     }
 
-    async delete<Req extends Record<string, string>, Res>(
-        apiRoute: string,
-        params: Req
-    ): Promise<Res> {
+    async delete<Req, Res>(apiRoute: string, params: Req): Promise<Res> {
         if (params) {
             const keys: string[] = Object.keys(params);
+            const values: unknown[] = Object.values(params);
 
             for (const [index, key] of keys.entries()) {
                 apiRoute =
                     apiRoute +
                     (index === 0
-                        ? `?${key}` + '=' + `${params[key]}`
-                        : `&${key}` + '=' + `${params[key]}`);
+                        ? `?${key}` + '=' + `${values[index]}`
+                        : `&${key}` + '=' + `${values[index]}`);
             }
         }
         return firstValueFrom(
