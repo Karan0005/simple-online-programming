@@ -116,6 +116,7 @@ export default (config: webpack.Configuration) => {
     config?.module?.rules?.push(
         {
             test: /\.css$/,
+            include: /node_modules[\\/]monaco-editor[\\/]/,
             use: [
                 'style-loader',
                 {
@@ -128,6 +129,7 @@ export default (config: webpack.Configuration) => {
         },
         {
             test: /\.ttf$/,
+            include: /node_modules[\\/]monaco-editor[\\/]/,
             type: 'asset/resource'
         }
     );
