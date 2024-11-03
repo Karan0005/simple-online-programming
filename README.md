@@ -4,8 +4,7 @@
 
 Looking to build the next [**NeetCode**](https://neetcode.io/),
 [**LeetCode**](https://leetcode.com/), [**HackerRank**](https://www.hackerrank.com/)?
-**simple-online-programming** is the ultimate **open-source substitute to
-[Judge0](https://github.com/judge0/judge0)**, designed to give you the flexibility, performance, and
+**simple-online-programming** is the ultimate **open-source solution, designed to give you the flexibility, performance, and
 features needed to create a high-performing, customizable online coding platform.
 
 With **simple-online-programming**, you can rapidly implement a powerful, scalable solution to
